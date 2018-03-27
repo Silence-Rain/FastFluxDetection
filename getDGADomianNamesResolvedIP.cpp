@@ -782,18 +782,32 @@ void getResolvedIPFromIPCIS_DNS_DB::domainMapping(const char* rfilebuff,const ch
     fin.close();
     fout.close();
 }
-int  main()
-{
-    getResolvedIPFromIPCIS_DNS_DB curObj;
-    curObj.InitFun();
-    // //"/home/xdzang/Fast_Flux_Detection/after_test1.txt");
-    // //curObj.get_primary_domain("www.facebook.com");
-    // //curObj.getNameServerofPrimaryDoamin("/home/xdzang/Fast_Flux_Detection/domainNameServerData.dat");
+// int  main()
+// {
+//     getResolvedIPFromIPCIS_DNS_DB curObj;
+//     curObj.InitFun();
+//     // //"/home/xdzang/Fast_Flux_Detection/after_test1.txt");
+//     // //curObj.get_primary_domain("www.facebook.com");
+//     // //curObj.getNameServerofPrimaryDoamin("/home/xdzang/Fast_Flux_Detection/domainNameServerData.dat");
 
-    // curObj.prmaimaryDomain_IPMapping("/home/xdzang/Fast_Flux_Detection/secondDomainDataSort.dat",
-    //                           "/home/xdzang/Fast_Flux_Detection/secondDomainIPMapping2.dat",3600);
+//     // curObj.prmaimaryDomain_IPMapping("/home/xdzang/Fast_Flux_Detection/secondDomainDataSort.dat",
+//     //                           "/home/xdzang/Fast_Flux_Detection/secondDomainIPMapping2.dat",3600);
 
-    cout<<"Hello!"<<endl;
-    return 0;
+//     cout<<curObj.get_primary_domain("www.aaa.com");
+//     return 0;
+// }
+
+extern "C" {
+    getResolvedIPFromIPCIS_DNS_DB obj;
+
+    void init()
+    {
+        return obj.InitFun();
+    }
+
+    char* getPrimaryDomain(const char* str)
+    {
+        return obj.get_primary_domain(str);
+    }
 }
 

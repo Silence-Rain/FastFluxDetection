@@ -25,37 +25,6 @@ def readdoaminFile(rfilebuf,wfilebuf):
     fread.close()
     fwrite.close()
 
-# 从rfilebuf中读取记录
-# 聚合相同域名的不同ip，将ttl和firsttime取最小值
-# 写入到新文件wfilebuf中
-def clusterDomains(rfilebuf, wfilebuf):
-    ret = [[""]]    # 最终写入结果
-
-    with open(rfilebuf, "r") as f:
-        res = f.readlines()
-        lastptr = 0     # 上一条记录的指针
-
-        # 按行读取
-        for i in range(0, len(res)):
-            arr = res[i].split(",")
-            temp = [arr[0], [int(arr[1])], int(arr[2]), int(arr[3])]     # 写入数据结构
-            last = ret[lastptr]     # 上一条记录
-
-            # 若当前记录的域名与上一条相同，则聚合
-            if temp[0] == last[0]:
-                last[1].append(temp[1][0])
-                last[2] = temp[2] if (temp[2] < last[2]) else last[2]
-                last[3] = temp[3] if (temp[3] < last[3]) else last[3]
-            else:
-                ret.append(temp)
-                lastptr += 1
-
-    ret = ret[1:]
-
-    with open(wfilebuf, "w") as f:
-        for item in ret:
-            f.write(str(item)[1:-1] + "\n")
-
 
 def getResolvedIPMatrixOfRawData(rfilebuf,timeWindow):
     matrix = []
@@ -104,6 +73,7 @@ def fast_FluxBotnetDetection(rfilebuf,timeWindow):
         elif int(foundTime) - ftime < timeWindow:
             matrix.append(list)
         else:
+            print 1
             # cluster domain names in matrix
             myArray = domainNameEditDistanceStandardMatrix(matrix)
             clusterUsingAgglomerativeClustering(myArray)
@@ -115,6 +85,8 @@ def fast_FluxBotnetDetection(rfilebuf,timeWindow):
             ftime = int(foundTime)
             break;
         templist = []
+    # print matrix
+
 def domainNameEditDistanceStandardMatrix(list):
     matrix = np.array(list)
     simMatrix = []
@@ -192,15 +164,16 @@ def simFun(list1,list2):
 
 
 if __name__ == '__main__':
-    clusterDomains("domainData_test.dat", "test_out")
+    fast_FluxBotnetDetection("domainData_Test.dat", 10)
+
     # srcFile = "I:/DNS_xdzang2017_12_07/domainIPMapping_test.dat"
     # destFile = "I:/DNS_xdzang2017_12_07/domainData_test.dat"
-    #getResolvedIPMatrixOfRawData(srcFile,3600)
+    # getResolvedIPMatrixOfRawData(srcFile,3600)
     # list1 =['2130706432', '2130772096', '2132869248', '2134900740', '2139095168', '2139160608', '2139161608', '2139162632', '2141257856']
     # list2= ['2130706432', '2130772096', '2132869248', '2134900740', '2139095168', '2139160608', '2139161608', '2139162632', '2141257855']
-    #simFun(list1,list2)
-    #calcuSimMatrix(srcFile,3600)
+    # simFun(list1,list2)
+    # calcuSimMatrix(srcFile,3600)
 
-    #readdoaminFile("I:/DNS_xdzang2017_12_07/domainDataSort.dat","I:/DNS_xdzang2017_12_07/domainData_Test.dat")
+    # readdoaminFile("I:/DNS_xdzang2017_12_07/domainDataSort.dat","I:/DNS_xdzang2017_12_07/domainData_Test.dat")
     # matrix =[["mcafee"],["jiashule"],["ourwebpic"]]
-    #domainNameEditDistanceStandardMatrix(matrix)
+    # domainNameEditDistanceStandardMatrix(matrix)
