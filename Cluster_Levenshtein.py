@@ -20,9 +20,9 @@ def initCppLibs():
 	init()		# 接口内部初始化
 
 
-# 从rfile中读取记录
+# 从rfile中读取记录，每行格式：domainName,ip,ttl,firstTime
 # 聚合相同域名的不同ip，将ttl和firsttime取最小值
-# 结果写入到wfile中
+# 结果写入到wfile中，每行格式：[domainName, [ip1, ip2, ...], ttl, firstTime]
 def clusterDomains(rfile, wfile):
 	ret = [[""]]    # 最终写入结果
 
@@ -51,7 +51,9 @@ def clusterDomains(rfile, wfile):
 		for item in ret:
 			f.write(str(item) + "\n")
 
-# 获取rfile中所有域名的二级三级域标签，写入到wfile中
+# 获取rfile中所有域名，每行格式：[domainName, [ip1, ip2, ...], ttl, firstTime]
+# 计算所有域名的二级三级域标签
+# 写入到wfile中，每行格式：(domainName, 2ndDomainLabel, 3rdDomainLabel)
 def get2dl3dl(rfile, wfile):
 	ret = []
 
@@ -69,9 +71,12 @@ def get2dl3dl(rfile, wfile):
 		for item in ret:
 			f.write(str(item) + "\n")
 
-# 获取rflie中所有域名及其二级，三级域标签
+# 获取rflie中所有域名及其二级，三级域标签，每行格式：(domainName, 2ndDomainLabel, 3rdDomainLabel)
 # 计算所有域名的二级，三级域标签两两之间的编辑距离
-# 结果写入到wfile中
+# 结果写入到wfile中，输出格式(dn: domainName, dl: domainLabel, ld: LevenshteinDistance)：
+# [dn0, (), (2dl's ld with dn1, 3dl's ld with dn1), (2dl's ld with dn2, 3dl's ld with dn2), ...]
+# [dn1, (2dl's ld with dn0, 3dl's ld with dn0), (), (2dl's ld with dn1, 3dl's ld with dn1), ...]
+# [dn2, (2dl's ld with dn0, 3dl's ld with dn0), (2dl's ld with dn1, 3dl's ld with dn1), (), ...]
 def getLevenshteinDistOf2dl3dl(rfile, wfile):
 	raw = []
 	res = []
@@ -80,9 +85,11 @@ def getLevenshteinDistOf2dl3dl(rfile, wfile):
 		for line in f.readlines():
 			raw.append(eval(line))
 
+	# 两两计算编辑距离
 	for i in raw:
 		temp = [i[0]]
 		for j in raw:
+			# 不计算自身和自身的编辑距离，记为空元组
 			if i[0] == j[0]:
 				temp.append(())
 			else:
