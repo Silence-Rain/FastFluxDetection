@@ -1,5 +1,6 @@
 #!coding=utf8
 
+import time
 import ctypes
 from ctypes import *
 import Levenshtein
@@ -20,11 +21,12 @@ def initCppLibs():
 	init()		# 接口内部初始化
 
 
-# 从rfile中读取记录，每行格式：domainName,ip,ttl,firstTime
+# 从rfile中读取在window时间窗口内的记录，每行格式：domainName,ip,ttl,firstTime
 # 聚合相同域名的不同ip，将ttl和firsttime取最小值
 # 结果写入到wfile中，每行格式：[domainName, [ip1, ip2, ...], ttl, firstTime]
-def clusterDomains(rfile, wfile):
-	ret = [[""]]    # 最终写入结果
+def clusterDomains(rfile, wfile, window):
+	ret = [[""]]    			# 最终写入结果
+	curTime = 1505115195 # int(time.time())	# 当前时间戳
 
 	with open(rfile, "r") as f:
 		res = f.readlines()
@@ -33,20 +35,23 @@ def clusterDomains(rfile, wfile):
 		# 按行读取
 		for i in range(0, len(res)):
 			arr = res[i].split(",")
-			temp = [arr[0], [int(arr[1])], int(arr[2]), int(arr[3])]     # 写入数据结构
-			last = ret[lastptr]     # 上一条记录
 
-			# 若当前记录的域名与上一条相同，则聚合
-			if temp[0] == last[0]:
-				last[1].append(temp[1][0])
-				last[2] = temp[2] if (temp[2] < last[2]) else last[2]
-				last[3] = temp[3] if (temp[3] < last[3]) else last[3]
-			else:
-				ret.append(temp)
-				lastptr += 1
+			# 若当前记录的发现时间在window时间窗口内，记录下来
+			if int(arr[-1]) >= curTime - window:
+				temp = [arr[0], [int(arr[1])], int(arr[2]), int(arr[3])]     # 写入数据结构
+				last = ret[lastptr]     # 上一条记录
+
+				# 若当前记录的域名与上一条相同，则聚合
+				if temp[0] == last[0]:
+					last[1].append(temp[1][0])
+					last[2] = temp[2] if (temp[2] < last[2]) else last[2]
+					last[3] = temp[3] if (temp[3] < last[3]) else last[3]
+				else:
+					ret.append(temp)
+					lastptr += 1
 
 	ret = ret[1:]
-
+	
 	with open(wfile, "w") as f:
 		for item in ret:
 			f.write(str(item) + "\n")
@@ -108,9 +113,8 @@ def getLevenshteinDistOf2dl3dl(rfile, wfile):
 
 if __name__ == '__main__':
 	initCppLibs()
-	getLevenshteinDistOf2dl3dl("domain_2dl3dl.dat", "domain_2dl3dl_levenshteinDist.dat")
-	# get2dl3dl("domainData_clustered.dat", "domain_2dl3dl.dat")
-	# clusterDomains("domainData_test.dat", "domainData_clustered.dat")
-
-
+	
+	clusterDomains("data/domainData_Test.dat", "data/domainData_clustered.dat", 1)
+	# get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl.dat")
+	# getLevenshteinDistOf2dl3dl("data/domain_2dl3dl.dat", "data/domain_2dl3dl_levenshteinDist.dat")
 
