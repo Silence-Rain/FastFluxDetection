@@ -147,7 +147,8 @@ def dbscanOfLevenshteinDist(rfile, wfile, mode):
 
 	clst = DBSCAN(eps=0.5, min_samples=10)
 	labels = clst.fit_predict(res[:,2].reshape(-1, 1))
-	print("Cluster types: %d" % (max(labels)+2))	# 要加上-1，0两个类型
+	print("Current label: %s") % ("secondary" if mode == 0 else "ternary")
+	print("Cluster types: %d" % (max(labels) + 2))	# 要加上-1，0两个类型
 	print("Core samples' num: %d" % len(clst.core_sample_indices_))
 
 	# # 作出聚类后数据的3D散点图
