@@ -9,7 +9,7 @@ from mpl_toolkits.mplot3d import Axes3D
 # 		data：numpy.array，三维数组
 #		labels：一维数组，表示聚类算法的分类结果
 def plot_3d_scatter(data, labels=[]):
-	# labels参数默认值为全0
+	# 设置labels参数默认值为全0
 	labels = labels if len(labels) != 0 else [0 for x in range(len(data))]
 
 	fig = plt.figure()
