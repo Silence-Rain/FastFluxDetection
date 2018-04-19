@@ -1,1 +1,3 @@
-*.dat
+data/
+__pycache__/
+.gitignore

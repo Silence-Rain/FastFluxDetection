@@ -4,6 +4,9 @@ import time
 import ctypes
 from ctypes import *
 import Levenshtein
+import numpy as np
+from sklearn.cluster import DBSCAN
+import plot
 
 getPrimaryDomain = None
 
@@ -87,7 +90,8 @@ def getLevenshteinDistOf2dl3dl(rfile, wfile):
 	res = []
 
 	with open(rfile, "r") as f:
-		for line in f.readlines():
+		# 计算前100个
+		for line in f.readlines()[:100]:
 			raw.append(eval(line))
 
 	# 两两计算编辑距离
@@ -109,12 +113,61 @@ def getLevenshteinDistOf2dl3dl(rfile, wfile):
 		for item in res:
 			f.write(str(item) + "\n")
 
+	print("Levenshtein Done!")
+
+# 根据mode取值确定聚类对象。0:二级域标签，1:三级域标签
+# 获取rfile中每个域名与其他所有域名标签之间的编辑距离。每行格式：[dn0, (), (2dl's ld with dn1, 3dl's ld with dn1), (2dl's ld with dn2, 3dl's ld with dn2), ...]
+# 使用DBSCAN算法对编辑距离聚类
+# 聚类结果写入wfile中。每行格式：[(域名对1), (域名对2), ...]
+def dbscanOfLevenshteinDist(rfile, wfile, mode):
+	raw = []
+
+	with open(rfile, "r") as f:
+		lines = f.readlines()
+
+		# 只取出n*n编辑距离矩阵的上三角部分（不含对角线），放入raw
+		# 得到的数据格式：[[dn0 with dn1, dn0 with dn2, ...], [dn1 with dn2, ...], ...]
+		for i in range(len(lines) - 1):
+			dat = eval(lines[i])[1:]
+			temp = []
+
+			for j in range(i + 1, len(lines)):
+				temp.append(dat[j][mode])	# 根据mode读入对应标签的编辑距离
+
+			raw.append(temp)
+
+	# 关联编辑距离对和其域名下标
+	# 得到的数据格式：[[i, j, dni with dnj], ...]
+	# 域名下标可在domainData_clustered.dat文件中找到映射
+	res = []
+	for i in range(len(raw)):
+		for j in range(len(raw)-i):
+			res.append([i, i+1+j, raw[i][j]])
+	res = np.array(res)
+
+	clst = DBSCAN(eps=0.5, min_samples=10)
+	labels = clst.fit_predict(res[:,2].reshape(-1, 1))
+	print("Cluster types: %d" % (max(labels)+2))	# 要加上-1，0两个类型
+	print("Core samples' num: %d" % len(clst.core_sample_indices_))
+
+	# # 作出聚类后数据的3D散点图
+	# plot.plot_3d_scatter(res, labels)
+
+	# 按照DBSCAN的聚类结果，将编辑距离对分类。结果写入wfile
+	ret = [[] for x in range(max(labels)+2)]
+	for i in range(len(labels)):
+		ret[labels[i]].append(tuple(res[i][:-1]))
+
+	with open(wfile, "w") as f:
+		for item in ret:
+			f.write(str(item) + "\n")
 
 
 if __name__ == '__main__':
-	initCppLibs()
+	# initCppLibs()
 	
-	clusterDomains("data/domainData_Test.dat", "data/domainData_clustered.dat", 1)
+	# clusterDomains("data/domainData_Test.dat", "data/domainData_clustered.dat", 1)
 	# get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl.dat")
-	# getLevenshteinDistOf2dl3dl("data/domain_2dl3dl.dat", "data/domain_2dl3dl_levenshteinDist.dat")
+	# getLevenshteinDistOf2dl3dl("data/domain_2dl3dl.dat", "data/domain_2dl3dl_levenshteinDist_1.dat")
+	dbscanOfLevenshteinDist("data/domain_2dl3dl_levenshteinDist_1.dat", "data/domain_2dl_dbscan.dat", 0)
 
