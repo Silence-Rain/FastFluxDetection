@@ -1,0 +1,4 @@
+Testing '[strptime("%Y-%m-%dT%H:%M:%SZ")|(.,mktime)]' at line number 4
+Testing 'strftime("%A, %B %e, %Y")' at line number 9
+2 of 2 tests passed (0 malformed)
+PASS tests/optionaltest (exit status: 0)

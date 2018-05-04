@@ -1,0 +1,131 @@
+Testing '[match("( )*"; "g")]' at line number 2
+*** Insufficient results for test at line number 4: [match("( )*"; "g")]
+Testing '[match("( )*"; "gn")]' at line number 6
+*** Insufficient results for test at line number 8: [match("( )*"; "gn")]
+Testing '[match("a"; "gi")]' at line number 10
+*** Insufficient results for test at line number 12: [match("a"; "gi")]
+Testing '[match(["(bar)"])]' at line number 14
+*** Insufficient results for test at line number 16: [match(["(bar)"])]
+Testing '[match("bar")]' at line number 19
+*** Insufficient results for test at line number 21: [match("bar")]
+Testing '[match("bār")]' at line number 24
+*** Insufficient results for test at line number 26: [match("bār")]
+Testing '[match(".+?\\b")]' at line number 28
+*** Insufficient results for test at line number 30: [match(".+?\\b")]
+Testing '[match(["foo (?<bar123>bar)? foo", "ig"])]' at line number 32
+*** Insufficient results for test at line number 34: [match(["foo (?<bar123>bar)? foo", "ig"])]
+Testing '[test("( )*"; "gn")]' at line number 37
+*** Insufficient results for test at line number 39: [test("( )*"; "gn")]
+Testing '[test("ā")]' at line number 41
+*** Insufficient results for test at line number 43: [test("ā")]
+Testing 'capture("(?<a>[a-z]+)-(?<n>[0-9]+)")' at line number 45
+*** Insufficient results for test at line number 47: capture("(?<a>[a-z]+)-(?<n>[0-9]+)")
+Testing '[.[] | sub(", "; ":")]' at line number 54
+*** Insufficient results for test at line number 56: [.[] | sub(", "; ":")]
+Testing 'sub("^(?<head>.)"; "Head=\(.head) Tail=")' at line number 58
+*** Insufficient results for test at line number 60: sub("^(?<head>.)"; "Head=\(.head) Tail=")
+Testing '[.[] | gsub(", "; ":")]' at line number 62
+*** Insufficient results for test at line number 64: [.[] | gsub(", "; ":")]
+Testing 'gsub("(?<d>\\d)"; ":\(.d);")' at line number 66
+*** Insufficient results for test at line number 68: gsub("(?<d>\\d)"; ":\(.d);")
+Testing 'gsub("a";"b")' at line number 70
+*** Insufficient results for test at line number 72: gsub("a";"b")
+Testing 'gsub( "(.*)"; "";  "x")' at line number 74
+*** Insufficient results for test at line number 76: gsub( "(.*)"; "";  "x")
+Testing '[.[] | scan(", ")]' at line number 78
+*** Insufficient results for test at line number 80: [.[] | scan(", ")]
+Testing '[.[]|[[sub(", *";":")], [gsub(", *";":")], [scan(", *")]]]' at line number 82
+*** Insufficient results for test at line number 84: [.[]|[[sub(", *";":")], [gsub(", *";":")], [scan(", *")]]]
+Testing '[.[]|[[sub(", +";":")], [gsub(", +";":")], [scan(", +")]]]' at line number 86
+*** Insufficient results for test at line number 88: [.[]|[[sub(", +";":")], [gsub(", +";":")], [scan(", +")]]]
+Testing 'gsub("(?<x>.)[^a]*"; "+\(.x)-")' at line number 91
+*** Insufficient results for test at line number 93: gsub("(?<x>.)[^a]*"; "+\(.x)-")
+Testing 'sub("(?<x>.)"; "\(.x)!")' at line number 96
+*** Insufficient results for test at line number 98: sub("(?<x>.)"; "\(.x)!")
+0 of 22 tests passed (0 malformed)
+==4550== 49 bytes in 1 blocks are definitely lost in loss record 3 of 17
+==4550==    at 0x4A06A2E: malloc (vg_replace_malloc.c:270)
+==4550==    by 0x40FDE5: jv_mem_alloc (jv_alloc.c:122)
+==4550==    by 0x40DF81: jvp_string_append (jv.c:441)
+==4550==    by 0x40E0EB: jv_string_concat (jv.c:791)
+==4550==    by 0x41CEFD: gen_binop (parser.y:238)
+==4550==    by 0x42107B: yyparse (parser.y:603)
+==4550==    by 0x421BB2: jq_parse (parser.y:945)
+==4550==    by 0x421C2D: jq_parse_library (parser.y:956)
+==4550==    by 0x428745: builtins_bind_one (builtin.c:1388)
+==4550==    by 0x429077: builtins_bind (builtin.c:1417)
+==4550==    by 0x40577D: jq_compile_args (execute.c:1089)
+==4550==    by 0x40A86C: run_jq_tests (jq_test.c:86)
+==4550== 
+==4550== 86 bytes in 5 blocks are definitely lost in loss record 4 of 17
+==4550==    at 0x4A06A2E: malloc (vg_replace_malloc.c:270)
+==4550==    by 0x40FDE5: jv_mem_alloc (jv_alloc.c:122)
+==4550==    by 0x40F820: jv_string_empty (jv.c:441)
+==4550==    by 0x40FBB8: jv_string_implode (jv.c:711)
+==4550==    by 0x42603E: f_string_implode (builtin.c:976)
+==4550==    by 0x407A12: jq_next (execute.c:784)
+==4550==    by 0x40AAD4: run_jq_tests (jq_test.c:146)
+==4550==    by 0x40B0A2: jq_testsuite (jq_test.c:22)
+==4550==    by 0x403FA6: main (main.c:438)
+==4550== 
+==4550== 121 bytes in 5 blocks are definitely lost in loss record 5 of 17
+==4550==    at 0x4A06A2E: malloc (vg_replace_malloc.c:270)
+==4550==    by 0x40FDE5: jv_mem_alloc (jv_alloc.c:122)
+==4550==    by 0x40E60E: jv_string_sized (jv.c:441)
+==4550==    by 0x41666C: jv_parser_next (jv_parse.c:464)
+==4550==    by 0x416E97: jv_parse_sized (jv_parse.c:815)
+==4550==    by 0x4171D6: jv_parse (jv_parse.c:851)
+==4550==    by 0x40AA70: run_jq_tests (jq_test.c:140)
+==4550==    by 0x40B0A2: jq_testsuite (jq_test.c:22)
+==4550==    by 0x403FA6: main (main.c:438)
+==4550== 
+==4550== 469 (392 direct, 77 indirect) bytes in 1 blocks are definitely lost in loss record 9 of 17
+==4550==    at 0x4A06A2E: malloc (vg_replace_malloc.c:270)
+==4550==    by 0x40FDE5: jv_mem_alloc (jv_alloc.c:122)
+==4550==    by 0x40D157: jvp_object_new (jv.c:874)
+==4550==    by 0x40DEDD: jv_object (jv.c:1091)
+==4550==    by 0x4167E8: jv_parser_next (jv_parse.c:156)
+==4550==    by 0x416E97: jv_parse_sized (jv_parse.c:815)
+==4550==    by 0x4171D6: jv_parse (jv_parse.c:851)
+==4550==    by 0x40AA70: run_jq_tests (jq_test.c:140)
+==4550==    by 0x40B0A2: jq_testsuite (jq_test.c:22)
+==4550==    by 0x403FA6: main (main.c:438)
+==4550== 
+==4550== 576 bytes in 21 blocks are definitely lost in loss record 11 of 17
+==4550==    at 0x4A06A2E: malloc (vg_replace_malloc.c:270)
+==4550==    by 0x40FDE5: jv_mem_alloc (jv_alloc.c:122)
+==4550==    by 0x40E60E: jv_string_sized (jv.c:441)
+==4550==    by 0x41666C: jv_parser_next (jv_parse.c:464)
+==4550==    by 0x416E97: jv_parse_sized (jv_parse.c:815)
+==4550==    by 0x4171D6: jv_parse (jv_parse.c:851)
+==4550==    by 0x40A8AD: run_jq_tests (jq_test.c:129)
+==4550==    by 0x40B0A2: jq_testsuite (jq_test.c:22)
+==4550==    by 0x403FA6: main (main.c:438)
+==4550== 
+==4550== 1,355 bytes in 27 blocks are definitely lost in loss record 12 of 17
+==4550==    at 0x4A06A2E: malloc (vg_replace_malloc.c:270)
+==4550==    by 0x40FDE5: jv_mem_alloc (jv_alloc.c:122)
+==4550==    by 0x40DF81: jvp_string_append (jv.c:441)
+==4550==    by 0x40E0EB: jv_string_concat (jv.c:791)
+==4550==    by 0x41CEFD: gen_binop (parser.y:238)
+==4550==    by 0x42107B: yyparse (parser.y:603)
+==4550==    by 0x421BB2: jq_parse (parser.y:945)
+==4550==    by 0x41AAE0: load_program (linker.c:371)
+==4550==    by 0x4056A5: jq_compile_args (execute.c:1080)
+==4550==    by 0x40A86C: run_jq_tests (jq_test.c:86)
+==4550==    by 0x40B0A2: jq_testsuite (jq_test.c:22)
+==4550==    by 0x403FA6: main (main.c:438)
+==4550== 
+==4550== 17,867 (4,080 direct, 13,787 indirect) bytes in 15 blocks are definitely lost in loss record 17 of 17
+==4550==    at 0x4A06A2E: malloc (vg_replace_malloc.c:270)
+==4550==    by 0x40FDE5: jv_mem_alloc (jv_alloc.c:122)
+==4550==    by 0x40E135: jv_array_sized (jv.c:186)
+==4550==    by 0x40E17D: jv_array (jv.c:314)
+==4550==    by 0x416CE2: jv_parser_next (jv_parse.c:151)
+==4550==    by 0x416E97: jv_parse_sized (jv_parse.c:815)
+==4550==    by 0x4171D6: jv_parse (jv_parse.c:851)
+==4550==    by 0x40AA70: run_jq_tests (jq_test.c:140)
+==4550==    by 0x40B0A2: jq_testsuite (jq_test.c:22)
+==4550==    by 0x403FA6: main (main.c:438)
+==4550== 
+FAIL tests/onigtest (exit status: 1)
