@@ -1,5 +1,0 @@
-ATLAS:Active Threat Level Analysis System (ATLAS) <http://atlas.arbor.net/summary/fastflux>
-DNSBL<http://www.dnsbl.info/>
-DNSBH <http://www.malwaredomains.com/wordpress/>
-ZeuSTracker<http://zeustracker.abuse.ch/monitor.php?filter=level5>
-Alexa <http://www.alexa.com/topsites>Ç°1Íò

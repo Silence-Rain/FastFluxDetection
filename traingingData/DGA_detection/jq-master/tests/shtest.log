@@ -1,6 +1,0 @@
-true
-true
-parse error: Unfinished string at EOF at line 2, column 0
-true
-true
-PASS tests/shtest (exit status: 0)
