@@ -60,14 +60,6 @@ struct TimeSpec
 	int month;
 	int mday;
 };
-struct whoisInfo_
-{
-    long registerTime;
-    long expiredTime;
-    long updateTime;
-    int role;
-    set<string>Ipsets;
-}whoisInfoTraining;
 class clusterUsingDomainInfo
 {
     public:
@@ -76,9 +68,7 @@ class clusterUsingDomainInfo
         void alexTopAMillionProcess(const char *rFilebuff,const char *wFilebuff);
         void filterMaliciousDomains(const char *rFilebuff,const char *wFilebuff);
         map<int,vector<struct domain_IP_TTl_> > getDomianFromInfoTestFile(const char *rFilebuff,bool isTrainging);
-        int getPrimaryDomianOwnerInfo(string domain,string key,bool isTraining,string fileLocation);
         time_t MakeTime(string &str);
-        struct whoisInfo_  processDataWhoisInfo(const char* whoisFile,const char* IPFile,bool isTraining);
         void normalizeDict(const char *rFilebuf, const char *wFilebuf);
         void processorDomainFile(const char *rFilebuf,const char *ipblackfi,
                             const char *wFilebuf,const char *blackdomainfile);
@@ -99,8 +89,6 @@ class clusterUsingDomainInfo
         vector<double> nGramAverageAnddeviationCalcu(set<string>ngrams,Trie_node root);
         double medianCalcu(vector<int>ngramSet);
         trieTree* getTrieTree();
-        void getWhoisInfo(map<string,vector<string> >domainPara,const char *wfilebuff,
-                          const char *blackdomainfile,bool isTraining,bool isMacilicous);
         u_long ip2long(const char *ip);
         struct domain_IP_TTl_ parsingDomainIPString(string line,bool isTrainging);
         void featureVectorCalcu(map<int,vector<struct domain_IP_TTl_> >domainIpPara,Trie_node root,
@@ -113,15 +101,15 @@ class clusterUsingDomainInfo
 
         void getlostDoamin(const char *readFile,const char *rFilewhois,
                            const char *rbadFile,const char *wlostwrite);
-       void domain3ldbigthanfive(map<string,vector<string> > paraGrouping,const char* wfilebuf);
+        void domain3ldbigthanfive(map<string,vector<string> > paraGrouping,const char* wfilebuf);
         friend set<string> operator+(const set<string> &a, const set<string>& b);//集合并运算
         friend set<string> operator*(const set<string> &a, const set<string>& b);//集合交运算
-       void getResolvedIPSimilarityMatrix(const char *domain_ipfile,const char *similarmatrxifile);
-       void getThreeLevelDoamin(const char *Alexfile,const char *AlexfileZWW,const char *wfile);
-       //以下为对比试验部分
-       void getMeaningfulCharactersRatio(const char* rfilebuf,const char* wfilebuf,Trie_node root);
-       void ngramCalcu(const char* rfilebuf,const char* wfilebuf,Trie_node root,bool isbenign);
-       double ngramValue(set<string>ngrams,Trie_node root);
+        void getResolvedIPSimilarityMatrix(const char *domain_ipfile,const char *similarmatrxifile);
+        void getThreeLevelDoamin(const char *Alexfile,const char *AlexfileZWW,const char *wfile);
+        //以下为对比试验部分
+        void getMeaningfulCharactersRatio(const char* rfilebuf,const char* wfilebuf,Trie_node root);
+        void ngramCalcu(const char* rfilebuf,const char* wfilebuf,Trie_node root,bool isbenign);
+        double ngramValue(set<string>ngrams,Trie_node root);
     private:
         DGA_detection m_DGA_detection;
         trieTree *m_trieTree;
