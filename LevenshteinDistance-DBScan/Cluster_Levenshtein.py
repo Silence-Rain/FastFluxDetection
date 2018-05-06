@@ -1,18 +1,17 @@
 #!coding=utf8
 
 import time
-import ctypes
 from ctypes import *
 import Levenshtein
 import numpy as np
 from sklearn.cluster import DBSCAN
-import utils.plot as plot
+from utils import plot
 
 getPrimaryDomain = None
 
 # 初始化C++接口调用
 def initCppLibs():
-	ll = ctypes.cdll.LoadLibrary
+	ll = cdll.LoadLibrary
 	lib = ll("lib/libPrimaryDomain.so")
 	global getPrimaryDomain
 
@@ -169,10 +168,10 @@ def dbscanOfLevenshteinDist(rfile, wfile, mode):
 
 
 if __name__ == '__main__':
-	# initCppLibs()
+	initCppLibs()
 	
 	# clusterDomains("data/domainData_Test.dat", "data/domainData_clustered.dat", 1)
-	# get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl.dat")
+	get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl1.dat")
 	# getLevenshteinDistOf2dl3dl("data/domain_2dl3dl.dat", "data/domain_2dl3dl_levenshteinDist_1.dat")
-	dbscanOfLevenshteinDist("data/domain_2dl3dl_levenshteinDist_1.dat", "data/domain_2dl_dbscan.dat", 0)
+	# dbscanOfLevenshteinDist("data/domain_2dl3dl_levenshteinDist_1.dat", "data/domain_2dl_dbscan.dat", 0)
 

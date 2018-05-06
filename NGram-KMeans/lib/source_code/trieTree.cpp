@@ -57,20 +57,20 @@ int  trieTree::statisticsNgramsOccurenceTimes(Trie_node root,char *str)
     if(*ptrStr =='\0')
     {
         counts = tempDode->counts;
-        if(tempDode->flag == false)
-        {
-            cout<< str<<":is a prefix,occurence:"<<counts<<endl;
-        }
-        else
-        {
-           cout<< str<<": is  a word,occurence:"<<counts<<endl;
-        }
+        // if(tempDode->flag == false)
+        // {
+        //     cout<< str<<":is a prefix,occurence:"<<counts<<endl;
+        // }
+        // else
+        // {
+        //    cout<< str<<": is  a word,occurence:"<<counts<<endl;
+        // }
 
     }
     else
     {
         counts = 0;
-        cout<< str<<": is not in trie Tree:"<<counts<<endl;
+        // cout<< str<<": is not in trie Tree:"<<counts<<endl;
     }
     return counts;
 }
@@ -105,14 +105,14 @@ bool trieTree::statisticsSrtingIsWord(Trie_node root,char *str)
         }
         else
         {
-           cout<<"is word:"<<str<<endl;
+           // cout<<"is word:"<<str<<endl;
            isWord = true;
         }
 
     }
     else
     {
-        cout<< str<<": is not in trie Tree"<<endl;
+        // cout<< str<<": is not in trie Tree"<<endl;
     }
     return isWord;
 }
@@ -138,22 +138,22 @@ void trieTree::search_str(Trie_node root,char *str)             //查找串是�
         }
 
     }
-    if(*p =='\0')
-    {
-        if(t->flag == false)
-        {
-            cout<< str<<":is not in trie Tree,but its prefix"<<endl;
-        }
-        else
-        {
-           cout<< str<<": is  in trie Tree"<<endl;
-        }
+    // if(*p =='\0')
+    // {
+    //     if(t->flag == false)
+    //     {
+    //         cout<< str<<":is not in trie Tree,but its prefix"<<endl;
+    //     }
+    //     else
+    //     {
+    //        cout<< str<<": is  in trie Tree"<<endl;
+    //     }
 
-    }
-    else
-    {
-        cout<< str<<": is not in trie Tree"<<endl;
-    }
+    // }
+    // else
+    // {
+    //     cout<< str<<": is not in trie Tree"<<endl;
+    // }
 
 }
 void trieTree::del(Trie_node root)      //释放整个字典树占的堆空间
@@ -223,24 +223,9 @@ Trie_node trieTree::getTrieTreeRoot()
 }
 trieTree::~trieTree()
 {
-    //cout<<"call trieTree deconstructor"<<endl;
     if(m_trieTreeRoot != NULL)
     {
-        //cout << "tree root = " << m_trieTreeRoot << endl;
         del(m_trieTreeRoot);
     }
 
 }
-/*
-int main()
-{
-    trieTree curTrieTee;
-    Trie_node root = NULL;
-    root = curTrieTee.constructTrieTree(DICT_FILE);
-    curTrieTee.statisticsNgramsOccurenceTimes(root,"abc");
-
-    return 0;
-
-
-}
-*/

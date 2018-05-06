@@ -456,7 +456,6 @@ void clusterUsingDomainInfo::initFun()
 //解析域名字符串，提取域名的2LD和3LD 如www.baidu.com 2d:baidu
 nLdDomainLevel clusterUsingDomainInfo::getDomainNLDs(string domainName)
 {
-    //cout<<"domainName:"<<domainName<<endl;
     size_t label;
     size_t slabel;
     char *secondLevelDomain = NULL;
@@ -470,7 +469,6 @@ nLdDomainLevel clusterUsingDomainInfo::getDomainNLDs(string domainName)
     if(dname != NULL)
     {
         secondLevelDomain = m_DGA_detection.get_primary_domain(dname);
-        //cout<<"secondLevelDomain:"<<secondLevelDomain<<endl;
     }
     if(secondLevelDomain == NULL)
     {
@@ -483,32 +481,25 @@ nLdDomainLevel clusterUsingDomainInfo::getDomainNLDs(string domainName)
     slabel = secondLevelDomainStr.find_first_of('.');
     secondLevelDomainLabel= secondLevelDomainStr.substr(0, slabel);
     m_domainLDs.secondLD = secondLevelDomainLabel;
-    //cout<<"m_domainLDs.secondLD:"<<m_domainLDs.secondLD<<endl;
     subDomain = domainName.substr(0, domainName.length() - secondLevelDomainStr.length());
-    //cout<<"subDomain:"<<subDomain<<endl;
     if(subDomain.length() == 0)
     {
         m_domainLDs.thirdLD = "";
-        //cout<<"thirdLevelDomain:"<<m_domainLDs.thirdLD<<endl;
     }
     else
     {
 
         label = subDomain.find_last_of('.');
-        //cout<<"label:"<<label<<endl;
         string subThirDomian = subDomain.substr(0, label);
-        //cout<<"subThirDomian:"<<subThirDomian<<endl;
         int index = subThirDomian.find_last_of('.');
         if(index == string::npos)
         {
             m_domainLDs.thirdLD = subThirDomian;
-            //cout<<"thirdLevelDomain:"<<m_domainLDs.thirdLD<<endl;
         }
         else
         {
             thirdLevelDomain = subDomain.substr(index + 1, subThirDomian.length() - index - 1);
             m_domainLDs.thirdLD = thirdLevelDomain;
-            //cout<<"thirdLevelDomain:"<<m_domainLDs.thirdLD<<endl;
         }
     }
 
@@ -526,11 +517,9 @@ int clusterUsingDomainInfo::tLDCountsInDomain(string domainName)
     string thirdLevelDomain;
     string subDomain;
     char *dname = (char*)domainName.c_str();
-    //cout<<"dame:"<<dname<<endl;
     if(dname != NULL)
     {
         secondLevelDomain = m_DGA_detection.get_primary_domain(dname);
-        //cout<<"secondLevelDomain:"<<secondLevelDomain<<endl;
     }
     else
     {
@@ -549,12 +538,10 @@ int clusterUsingDomainInfo::tLDCountsInDomain(string domainName)
                 counts++;
             }
         }
-        //cout<<"counts:"<<counts<<endl;
         return counts;
     }
     else
     {
-        //cout<<"counts:"<<counts<<endl;
         return counts;
     }
 
@@ -781,15 +768,14 @@ double clusterUsingDomainInfo::numericPercentageInDomain(string domainName)
                 counts++;
             }
         }
-        double percent = double(counts)/domainName.length();
-        int tmp = int (percent*100);
-        percentage = double(tmp/100);
+        percentage = double(counts)/domainName.length();
+        // int tmp = int(percent*100);
+        // percentage = double(tmp)/100;
     }
     else
     {
         percentage = 0.0;
     }
-    //cout<<"numeric counts:"<<counts<<endl;
 
     return percentage;
 }
@@ -932,145 +918,7 @@ map<string,vector<string> > clusterUsingDomainInfo::secondLDGrouping(const char*
     return m_dnameGrouping;
 
 }
-void clusterUsingDomainInfo::featureVectorCalcu(map<int,vector<struct domain_IP_TTl_> >domainIpPara,
-                                        Trie_node root,const char *wfilebuf,bool isTraing)
-{
-    for(map<int,vector<struct domain_IP_TTl_> >::iterator iter = domainIpPara.begin();
-        iter != domainIpPara.end();++iter)
-    {
-        featureVectorCalculate(iter->second,root,wfilebuf,isTraing);
-    }
-}
-void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_>domains,
-                                        Trie_node root,const char *wfilebuf,bool isTraing)
-{
-    vector<double> temp;
-    set<string>sgramsOfsecLD;
-    set<string>sgramsOfthirLD;
-    set<string>tgramsOfsecLD;
-    set<string>tgramsOfthirLD;
 
-    vector<double>ssAverDeviation;  //2ld_2gram
-    vector<double>tsAverDeviation;  //3ld_2gram
-    vector<double>stAverDeviation;  //2ld_3gram
-    vector<double>ttAverDeviation;  //3ld_3gram
-    double secLDEntroy;
-    double thirLDEntroy;
-    int countNLDs;
-    int lenofsLD;
-    int lenoftLD;
-    int lenofDomain;
-    double perofSec;
-    double perofThir;
-    nLdDomainLevel nLdDomainstruct;
-    int counts = 0;
-    ofstream fout(wfilebuf, ios::out);
-    if(!fout.is_open())
-    {
-        cout<<"create featureVector file error"<<endl;
-        return;
-    }
-    //cout<<"domains size:"<<domains.size()<<endl;
-    for(vector<struct domain_IP_TTl_>::iterator iter = domains.begin(); iter != domains.end();++iter)
-    {
-        nLdDomainstruct = getDomainNLDs(iter->domainName);//提取二级域名及三级域名
-        //ngram 计算
-        sgramsOfsecLD =  n_GramFeatureCalcu(nLdDomainstruct.secondLD, 2);
-        sgramsOfthirLD = n_GramFeatureCalcu(nLdDomainstruct.thirdLD, 2);
-        tgramsOfsecLD =  n_GramFeatureCalcu(nLdDomainstruct.secondLD, 3);
-        tgramsOfthirLD = n_GramFeatureCalcu(nLdDomainstruct.thirdLD, 3);
-        //平均值、方差计算
-        ssAverDeviation = nGramAverageAnddeviationCalcu(sgramsOfsecLD,root);
-        tsAverDeviation = nGramAverageAnddeviationCalcu(sgramsOfthirLD,root);
-        stAverDeviation =  nGramAverageAnddeviationCalcu(tgramsOfsecLD,root);
-        ttAverDeviation =  nGramAverageAnddeviationCalcu(tgramsOfthirLD,root);
-        //Entroy 计算
-        secLDEntroy =  getEntroy(nLdDomainstruct.secondLD);
-        thirLDEntroy = getEntroy(nLdDomainstruct.thirdLD);
-        //nLd计算及二、三级域名长度
-        countNLDs = tLDCountsInDomain(iter->domainName);
-        lenofsLD = lengthOfNLDs(nLdDomainstruct.secondLD);
-        lenoftLD = lengthOfNLDs(nLdDomainstruct.thirdLD);
-        lenofDomain = lengthOfDomain(iter->domainName);
-        //计算数字比率
-        perofSec = numericPercentageInDomain(nLdDomainstruct.secondLD);
-        perofThir = numericPercentageInDomain(nLdDomainstruct.thirdLD);
-        for(vector<double>::iterator it = ssAverDeviation.begin(); it!= ssAverDeviation.end();++it)
-        {
-            //2gram,2lD average median deviation;
-            temp.push_back(*it);
-        }
-        for(vector<double>::iterator it = tsAverDeviation.begin(); it!= tsAverDeviation.end();++it)
-        {
-            //2gram,3lD average median deviation;
-            temp.push_back(*it);
-        }
-        for(vector<double>::iterator it = stAverDeviation.begin(); it!= stAverDeviation.end();++it)
-        {
-            //3gram,2lD average median deviation;
-            temp.push_back(*it);
-        }
-        for(vector<double>::iterator it = ttAverDeviation.begin(); it!= ttAverDeviation.end();++it)
-        {
-            //3gram,3lD average median deviation;
-            temp.push_back(*it);
-        }
-        temp.push_back(secLDEntroy);
-        temp.push_back(thirLDEntroy);
-        temp.push_back(double(countNLDs));
-        temp.push_back(double(lenofsLD));
-        temp.push_back(double(lenoftLD));
-        temp.push_back(double(lenofDomain));
-        temp.push_back(perofSec);
-        temp.push_back(perofThir);
-        // temp.push_back(double(iter->elapseTime));
-        // temp.push_back(double(iter->isupdate));
-        // temp.push_back(double(iter->role));
-        // temp.push_back(iter->ipLocationEntroy);
-        if(isTraing == true)
-        {
-            temp.push_back((double)iter->traingFlag);
-        }
-        //写文件;
-        fout<<iter->domainName<<",";
-        for(int i = 0; i < temp.size(); i++)
-        {
-            if( (i+ 1) == temp.size())
-            {
-                fout<<temp.at(i);
-            }
-            else
-            {
-                fout<<temp.at(i)<<",";
-            }
-
-        }
-        fout<<endl;
-        //clear 变量
-        temp.clear();
-        sgramsOfsecLD.clear();
-        sgramsOfthirLD.clear();
-        tgramsOfsecLD.clear();
-        tgramsOfthirLD.clear();
-
-        ssAverDeviation.clear();  //2ld_2gram
-        tsAverDeviation.clear();  //3ld_2gram
-        stAverDeviation.clear();  //2ld_3gram
-        ttAverDeviation.clear(); //3ld_3gram
-        secLDEntroy = 0.0;
-        thirLDEntroy =0.0;
-        countNLDs = 0;
-        lenofsLD = 0;
-        lenoftLD = 0;
-        lenofDomain = 0;
-        perofSec = 0.0;
-        perofThir = 0.0;
-        nLdDomainstruct.secondLD.clear();
-        nLdDomainstruct.thirdLD.clear();
-        //cout<<"counts:"<<counts;
-    }
-    fout.close();
-}
 trieTree* clusterUsingDomainInfo::getTrieTree()
 {
     return m_trieTree;
@@ -1680,18 +1528,170 @@ void clusterUsingDomainInfo::ngramCalcu(const char* rfilebuf,const char* wfilebu
         ngrams.clear();
     }
 }
+void clusterUsingDomainInfo::featureVectorCalcu(map<int,vector<struct domain_IP_TTl_> >domainIpPara,
+                                        Trie_node root,const char *wfilebuf,bool isTraing)
+{
+    for(map<int,vector<struct domain_IP_TTl_> >::iterator iter = domainIpPara.begin();
+        iter != domainIpPara.end();++iter)
+    {
+        featureVectorCalculate(iter->second,root,wfilebuf,isTraing);
+    }
+}
+void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_>domains,
+                                        Trie_node root,const char *wfilebuf,bool isTraing)
+{
+    vector<double> temp;
+    set<string>sgramsOfsecLD;
+    set<string>sgramsOfthirLD;
+    set<string>tgramsOfsecLD;
+    set<string>tgramsOfthirLD;
+
+    vector<double>ssAverDeviation;  //2ld_2gram
+    vector<double>tsAverDeviation;  //3ld_2gram
+    vector<double>stAverDeviation;  //2ld_3gram
+    vector<double>ttAverDeviation;  //3ld_3gram
+    double secLDEntroy;
+    double thirLDEntroy;
+    int countNLDs;
+    int lenofsLD;
+    int lenoftLD;
+    int lenofDomain;
+    double perofSec;
+    double perofThir;
+    nLdDomainLevel nLdDomainstruct;
+    int counts = 0;
+    ofstream fout(wfilebuf, ios::out);
+    if(!fout.is_open())
+    {
+        cout<<"create featureVector file error"<<endl;
+        return;
+    }
+    for(vector<struct domain_IP_TTl_>::iterator iter = domains.begin(); iter != domains.end();++iter)
+    {
+        nLdDomainstruct = getDomainNLDs(iter->domainName);//提取二级域名及三级域名
+        //ngram 计算
+        sgramsOfsecLD =  n_GramFeatureCalcu(nLdDomainstruct.secondLD, 2);
+        sgramsOfthirLD = n_GramFeatureCalcu(nLdDomainstruct.thirdLD, 2);
+        tgramsOfsecLD =  n_GramFeatureCalcu(nLdDomainstruct.secondLD, 3);
+        tgramsOfthirLD = n_GramFeatureCalcu(nLdDomainstruct.thirdLD, 3);
+        //平均值、方差计算
+        ssAverDeviation = nGramAverageAnddeviationCalcu(sgramsOfsecLD,root);
+        tsAverDeviation = nGramAverageAnddeviationCalcu(sgramsOfthirLD,root);
+        stAverDeviation =  nGramAverageAnddeviationCalcu(tgramsOfsecLD,root);
+        ttAverDeviation =  nGramAverageAnddeviationCalcu(tgramsOfthirLD,root);
+        //Entroy 计算
+        secLDEntroy =  getEntroy(nLdDomainstruct.secondLD);
+        thirLDEntroy = getEntroy(nLdDomainstruct.thirdLD);
+        //nLd计算及二、三级域名长度
+        //countNLDs = tLDCountsInDomain(iter->domainName);
+        lenofsLD = lengthOfNLDs(nLdDomainstruct.secondLD);
+        lenoftLD = lengthOfNLDs(nLdDomainstruct.thirdLD);
+        lenofDomain = lengthOfDomain(iter->domainName);
+        //计算数字比率
+        perofSec = numericPercentageInDomain(nLdDomainstruct.secondLD);
+        perofThir = numericPercentageInDomain(nLdDomainstruct.thirdLD);
+
+        for(vector<double>::iterator it = ssAverDeviation.begin(); it!= ssAverDeviation.end();++it)
+        {
+            //2gram,2lD average median deviation;
+            temp.push_back(*it);
+        }
+        for(vector<double>::iterator it = tsAverDeviation.begin(); it!= tsAverDeviation.end();++it)
+        {
+            //2gram,3lD average median deviation;
+            temp.push_back(*it);
+        }
+        for(vector<double>::iterator it = stAverDeviation.begin(); it!= stAverDeviation.end();++it)
+        {
+            //3gram,2lD average median deviation;
+            temp.push_back(*it);
+        }
+        for(vector<double>::iterator it = ttAverDeviation.begin(); it!= ttAverDeviation.end();++it)
+        {
+            //3gram,3lD average median deviation;
+            temp.push_back(*it);
+        }
+        temp.push_back(secLDEntroy);
+        temp.push_back(thirLDEntroy);
+        //temp.push_back(double(countNLDs));
+        temp.push_back(double(lenofsLD));
+        temp.push_back(double(lenoftLD));
+        temp.push_back(double(lenofDomain));
+        temp.push_back(perofSec);
+        temp.push_back(perofThir);
+        // temp.push_back(double(iter->elapseTime));
+        // temp.push_back(double(iter->isupdate));
+        // temp.push_back(double(iter->role));
+        // temp.push_back(iter->ipLocationEntroy);
+        if(isTraing == true)
+        {
+            temp.push_back((double)iter->traingFlag);
+        }
+        //写文件;
+        fout<<iter->domainName<<",";
+        for(int i = 0; i < temp.size(); i++)
+        {
+            if( (i + 1) == temp.size())
+            {
+                fout<<temp.at(i);
+            }
+            else
+            {
+                fout<<temp.at(i)<<",";
+            }
+
+        }
+        fout<<endl;
+        //clear 变量
+        temp.clear();
+        sgramsOfsecLD.clear();
+        sgramsOfthirLD.clear();
+        tgramsOfsecLD.clear();
+        tgramsOfthirLD.clear();
+
+        ssAverDeviation.clear();  //2ld_2gram
+        tsAverDeviation.clear();  //3ld_2gram
+        stAverDeviation.clear();  //2ld_3gram
+        ttAverDeviation.clear(); //3ld_3gram
+        secLDEntroy = 0.0;
+        thirLDEntroy =0.0;
+        countNLDs = 0;
+        lenofsLD = 0;
+        lenoftLD = 0;
+        lenofDomain = 0;
+        perofSec = 0.0;
+        perofThir = 0.0;
+        nLdDomainstruct.secondLD.clear();
+        nLdDomainstruct.thirdLD.clear();
+    }
+    fout.close();
+}
+void testMap(map<int,vector<struct domain_IP_TTl_> > m)
+{
+    for (map<int,vector<struct domain_IP_TTl_> >::iterator iter = m.begin();
+        iter != m.end(); ++iter)
+    {
+        vector<struct domain_IP_TTl_> temp = iter->second;
+        for (vector<struct domain_IP_TTl_>::iterator it = temp.begin();
+            it != temp.end(); ++it)
+        {
+            cout<<it->domainName<<endl;
+        }
+    }
+}
 extern "C" {
     clusterUsingDomainInfo obj;
     map<int,vector<struct domain_IP_TTl_> > domainMap;
 
     void init()
     {
-        return obj.initFun();
+        obj.initFun();
     }
 
-    void getFeatureVec(const char* rfile, const char* wfile)
+    void getFeatureVector(const char* rfile, const char* wfile)
     {
         domainMap = obj.getDomianFromInfoTestFile(rfile, false);
+        //testMap(domainMap);
         obj.featureVectorCalcu(domainMap, obj.getTrieTree()->getTrieTreeRoot(), wfile, false);
     }
 

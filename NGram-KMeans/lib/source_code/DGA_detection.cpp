@@ -108,7 +108,6 @@ int DGA_detection::is_dns_suf(char* dns_suf_str)
 }
 char* DGA_detection::get_primary_domain(char* dname)
 {
-    //cout<<"dname:"<<dname<<endl;
     int    domain_name_len;
 	int    index;
 	char   domain_name_str[DOMAIN_LEN];     //域名小写字符串
@@ -139,7 +138,6 @@ char* DGA_detection::get_primary_domain(char* dname)
         }
 		else
 		{
-			// fprintf(fp_error, "domain name has special character: %s\n", dname);
 			return NULL;
 		}
 	}
@@ -157,7 +155,6 @@ char* DGA_detection::get_primary_domain(char* dname)
 
 	//求取后缀、一层标签、二层标签
 	index = strlen(tmp_domain_name_str)-1;
-    //cout<<"000"<<endl;
 	while(index >= 0)
 	{
 		if(tmp_domain_name_str[index] == '.')
@@ -167,15 +164,12 @@ char* DGA_detection::get_primary_domain(char* dname)
 				memset(suffix, 0, sizeof(suffix));
 				strcpy(suffix, domain_name_str+index);
 				tmp_domain_name_str[index]='\0';
-				//cout<<"suffix:"<<suffix<<",tmp_domain_name_str:"<<tmp_domain_name_str<<endl;
 				flag = 1;
 			}
 			else
 			{
 				if(strlen(tmp_domain_name_str+index+1)>=LABEL_LEN)
 				{
-					// fprintf(fp_error, "domain name's label length is too long(>=%u): %s\n",
-                   //LABEL_LEN, dname);
 					//域名过长
 					return NULL;
 				}
@@ -187,7 +181,6 @@ char* DGA_detection::get_primary_domain(char* dname)
 					strcpy(first_label, tmp_domain_name_str+index+1);
 					tmp_domain_name_str[index]='\0';
 					flag = 2;
-					//cout<<"has_flabel == 1,first_label:"<<first_label<<endl;
 				}
 				else if(flag ==2)
 				{
@@ -196,7 +189,6 @@ char* DGA_detection::get_primary_domain(char* dname)
 					strcpy(second_label, tmp_domain_name_str+index+1);
 					tmp_domain_name_str[index]='\0';
 					flag=3;
-					//cout<<"has_slabel == 1,first_label:"<<first_label<<endl;
 				}
 				else
                 {
@@ -208,12 +200,10 @@ char* DGA_detection::get_primary_domain(char* dname)
 
 		index--;
 	}
-    //cout<<"11111"<<endl;
 	if( (index < 0) && strcmp(tmp_domain_name_str, "www") )
 	{
 		if(strlen(tmp_domain_name_str) >= LABEL_LEN)
 		{
-			// fprintf(fp_error, "domain name's label length is too long(>=%u): %s\n", LABEL_LEN, dname);
 			return NULL;
 		}
 		if(flag == 1)
@@ -221,32 +211,21 @@ char* DGA_detection::get_primary_domain(char* dname)
 			has_flabel = 1;
 			memset(first_label, 0, sizeof(first_label));
 			strcpy(first_label, tmp_domain_name_str);
-			//cout<<"first_label:"<<first_label<<endl;
 		}
 		else if(flag == 2)
 		{
 			has_slabel = 1;
 			memset(second_label, 0, sizeof(second_label));
 			strcpy(second_label, tmp_domain_name_str);
-			//cout<<"second_label:"<<first_label<<endl;
 		}
-		else
-        {
-            ;
-        }
 
 	}
-     //cout<<"2222"<<endl;
 	if(!has_flabel || (strlen(first_label)<1))
 	{
-		// fprintf(fp_error, "domain name has no first level domain: %s\n", dname);
-		//cout<<"333"<<endl;
 		return NULL;
 	}
-	//cout<<"first_label:"<<first_label<<",suffix:"<<suffix<<endl;
 	memset(primary_domain_str, 0, sizeof(primary_domain_str));
 	snprintf(primary_domain_str, sizeof(primary_domain_str), "%s%s", first_label, suffix);//生成二级域名
-	cout<<"output primary_domain_str:"<<primary_domain_str<<endl;
 	primary_domain = primary_domain_str;
 	return primary_domain;
 }

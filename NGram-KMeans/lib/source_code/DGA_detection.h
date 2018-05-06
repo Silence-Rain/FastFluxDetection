@@ -26,9 +26,9 @@ using namespace std;
 #define CREATE_TABLE_TIME        3600
 #define DOMAIN_LEN           128
 #define DOMAIN_LENGTH                       32*sizeof(unsigned int)
-#define FILE_LOCATION                       "./"
-#define LEGAL_LIST_FILE                     "./Legal_Domains_Suffixes"
-#define DNS_SUF_FILE         				"./Internet_Domains_Suffixes"
+#define FILE_LOCATION                       "lib/source_code"
+#define LEGAL_LIST_FILE                     "lib/source_code/Legal_Domains_Suffixes"
+#define DNS_SUF_FILE         				"lib/source_code/Internet_Domains_Suffixes"
 using namespace std;
 
 struct DETECTED_TIME

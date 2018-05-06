@@ -20,7 +20,6 @@
 using namespace std;
 
 #define MAX_CHILD       26 //26个英文字符
-#define DICT_FILE       "/home/xdzang/DGA_Detection/DICT_Test.txt"
 
 typedef struct Tree
 {

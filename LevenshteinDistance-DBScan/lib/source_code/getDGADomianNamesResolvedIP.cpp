@@ -751,10 +751,6 @@ char* getResolvedIPFromIPCIS_DNS_DB::get_primary_domain(const char* dname)
             memset(second_label, 0, sizeof(second_label));
             strcpy(second_label, tmp_domain_name_str);
         }
-        else
-        {
-            ;
-        }
 
     }
     if(!has_flabel || (strlen(first_label)<1))
