@@ -29,17 +29,12 @@
 #include <algorithm>
 #include "DGA_detection.h"
 #include "trieTree.h"
-#include "Python.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "getDomainFromDatabase.h"
-#include "getIPLocationFromIPCIS.h"
 using namespace std;
 
-#define  Domain_File        	"/home/xdzang/DGA_Detection/Domain.txt"
-#define  Dict_File_Normailized  "/home/xdzang/DGA_Detection/English_Words_Dict_Normalized"
-#define  Feature_Vector_File    "/home/xdzang/DGA_Detection/featureVectorFile.txt"
+#define  Dict_File_Normailized  "./English_Words_Dict_Normalized"
 
 typedef struct _nLdDomainLevel
 {
@@ -55,7 +50,6 @@ struct domain_IP_TTl_
     int elapseTime;
     int isupdate;
     int role;
-    //double  ASpercent;
     double  ipLocationEntroy;
     int traingFlag;
 }domain_IP_TTl;
@@ -82,10 +76,8 @@ class clusterUsingDomainInfo
         void alexTopAMillionProcess(const char *rFilebuff,const char *wFilebuff);
         void filterMaliciousDomains(const char *rFilebuff,const char *wFilebuff);
         map<int,vector<struct domain_IP_TTl_> > getDomianFromInfoTestFile(const char *rFilebuff,bool isTrainging);
-        vector<struct domain_IP_TTl_>getDomianFromInfoTrainingFile(const char *rFilebuff);
         int getPrimaryDomianOwnerInfo(string domain,string key,bool isTraining,string fileLocation);
         time_t MakeTime(string &str);
-        //struct owner_Info_ processWhoisInfo(const char* whoisFile);
         struct whoisInfo_  processDataWhoisInfo(const char* whoisFile,const char* IPFile,bool isTraining);
         void normalizeDict(const char *rFilebuf, const char *wFilebuf);
         void processorDomainFile(const char *rFilebuf,const char *ipblackfi,
@@ -101,24 +93,19 @@ class clusterUsingDomainInfo
         int lengthOfDomain(string domainName);
         double numericPercentageInDomain(string domainName);
         int tLDCountsInDomain(string domainName);
-        map<string,vector<string> >secondLDGrouping(const char*rFilebuff);
+        map<string,vector<string> > secondLDGrouping(const char*rFilebuff);
         void featureVectorCalculate(vector<struct domain_IP_TTl_>domains,Trie_node root,
                                     const char *wfilebuf,bool isTraing);
-        vector<double>nGramAverageAnddeviationCalcu(set<string>ngrams,Trie_node root);
+        vector<double> nGramAverageAnddeviationCalcu(set<string>ngrams,Trie_node root);
         double medianCalcu(vector<int>ngramSet);
         trieTree* getTrieTree();
-        void usingPythonGetTraingFile(const char *getIPpython,const char *getIPLocationpython);
-        void traingDataProcess(const char *rfilebuff,const char *wfilebuff);
         void getWhoisInfo(map<string,vector<string> >domainPara,const char *wfilebuff,
                           const char *blackdomainfile,bool isTraining,bool isMacilicous);
         u_long ip2long(const char *ip);
         struct domain_IP_TTl_ parsingDomainIPString(string line,bool isTrainging);
         void featureVectorCalcu(map<int,vector<struct domain_IP_TTl_> >domainIpPara,Trie_node root,
                                 const char *wfilebuf,bool isTraing);
-        set<string>readIPBlacklist(const char *rfilebuff);
-        void getDomainInfoFromDataBase(const char *domainInfoFile);
-        void getIPLocation(const char *domainInfoFile,const char *wInfoFile,bool istraing,
-                           bool isbenign);
+        set<string> readIPBlacklist(const char *rfilebuff);
         void readFirstTenThoundsand(const char *readFile,const char *writeFile);
         void trainDataProcssOfZWW(const char *readFile,const char *writeFile,bool isbengin);
         void getZWWDomain(const char *readFile,const char *domainfile,
@@ -135,7 +122,6 @@ class clusterUsingDomainInfo
        void getMeaningfulCharactersRatio(const char* rfilebuf,const char* wfilebuf,Trie_node root);
        void ngramCalcu(const char* rfilebuf,const char* wfilebuf,Trie_node root,bool isbenign);
        double ngramValue(set<string>ngrams,Trie_node root);
-       void getDGADomainInfoFromDataBase();
     private:
         DGA_detection m_DGA_detection;
         trieTree *m_trieTree;
@@ -143,9 +129,6 @@ class clusterUsingDomainInfo
         nLdDomainLevel m_domainLDs;
         vector<string>m_2gramVec;
         vector<string>m_3gramVec;
-        getDomainFromDatabase *m_getDomainFromDatabase;
-        getIPLocationFromIPCIS *getIPInfo;
-
 
 };
 

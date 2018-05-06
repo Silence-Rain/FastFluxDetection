@@ -20,21 +20,15 @@
 #include <set>
 #include <memory.h>
 using namespace std;
-//#include <mysql.h>
 #define DNS_MSUF_LEN        				80
 #define LABEL_LEN            				64
 #define MAX_DOMAIN_LEN                      1024
 #define CREATE_TABLE_TIME        3600
-//#define DB_DEFAULT_DB_HOST   "127.0.0.1"
-//#define DB_DEFAULT_DB_NAME   "DAOS_DNS"
-//#define DB_DEFAULT_DB_PORT   3307
-//#define DB_DEFAULT_DB_USER   "root"
-//#define DB_DEFAULT_DB_PWD    "rootofmysql"
 #define DOMAIN_LEN           128
 #define DOMAIN_LENGTH                       32*sizeof(unsigned int)
-#define FILE_LOCATION                       "/home/xdzang/DGA_Detection"
-#define LEGAL_LIST_FILE                     "/home/xdzang/DGA_Detection/Legal_Domains_Suffixes"
-#define DNS_SUF_FILE         				"/home/xdzang/DGA_Detection/Internet_Domains_Suffixes"
+#define FILE_LOCATION                       "./"
+#define LEGAL_LIST_FILE                     "./Legal_Domains_Suffixes"
+#define DNS_SUF_FILE         				"./Internet_Domains_Suffixes"
 using namespace std;
 
 struct DETECTED_TIME
@@ -78,9 +72,5 @@ class DGA_detection
         map<string,struct DOMAIN_INFO> dns_domain_info_map;
         set<string> dns_suf_set;
         set<string> suffix_set;//白名单，过滤合法域名
-        //MYSQL mysql;
-        //MYSQL_RES* query_result;
-        //MYSQL_ROW  row;
-        //map<string,struct DOMAIN_INFO> dns_domain_info_map;//域名->域名信息
 };
 

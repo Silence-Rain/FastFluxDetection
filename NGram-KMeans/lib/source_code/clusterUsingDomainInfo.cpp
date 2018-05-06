@@ -1,8 +1,7 @@
 #include "clusterUsingDomainInfo.h"
 clusterUsingDomainInfo::clusterUsingDomainInfo()
 {
-    getIPInfo = new getIPLocationFromIPCIS();
-    m_getDomainFromDatabase = new getDomainFromDatabase();
+
 }
 void clusterUsingDomainInfo::alexTopAMillionProcess(const char *rFilebuff,const char *wFilebuff)
 {
@@ -125,95 +124,12 @@ void clusterUsingDomainInfo::getWhoisInfo(map<string,vector<string> >domainPara,
     for(map<string,vector<string> >::iterator iter= domainPara.begin();
         iter!= domainPara.end();++iter)
     {
-        /*
-        counts++;
-
-        nums ++;
-        if(nums >= 3000)
-        {
-            nums = 0;
-            sleep(600);
-        }
-        */
         curdomianWhois.registerTime = 0;
         curdomianWhois.expiredTime = 0;
         curdomianWhois.updateTime = 0;
         curdomianWhois.role = 0;
         curdomianWhois.Ipsets.clear();
-        /*
-        if(counts%18 == 0)
-        {
-            key_api = key_api_0;
-        }
-        else if(counts%18 == 1)
-        {
-            key_api = key_api_1;
-        }
-        else if(counts%18 == 2)
-        {
-            key_api = key_api_2;
-        }
-        else if(counts%18 == 3)
-        {
-            key_api = key_api_3;
-        }
-        else if(counts%18 == 4)
-        {
-            key_api = key_api_4;
-        }
-        else if(counts%18 == 5)
-        {
-            key_api = key_api_5;
-        }
-        else if(counts%18 == 6)
-        {
-            key_api = key_api_6;
-        }
-        else if(counts%18 == 7)
-        {
-            key_api = key_api_7;
-        }
-        else if(counts%18 == 8)
-        {
-            key_api = key_api_8;
-        }
-        else if(counts%18 == 9)
-        {
-            key_api = key_api_9;
-        }
-        else if(counts%18 == 10)
-        {
-            key_api = key_api_10;
-        }
-        else if(counts%18 == 11)
-        {
-            key_api = key_api_11;
-        }
-        else if(counts%18 == 12)
-        {
-            key_api = key_api_12;
-        }
-        else if(counts%18 == 13)
-        {
-            key_api = key_api_13;
-        }
-        else if(counts%18 == 14)
-        {
-            key_api = key_api_14;
-        }
-        else if(counts%18 == 15)
-        {
-            key_api = key_api_15;
-        }
-        else if(counts%18 == 16)
-        {
-            key_api = key_api_16;
-        }
-        else if(counts%18 == 17)
-        {
-            key_api = key_api_17;
-        }
-        */
+        
         if( (iter->first).length() != 0) //primary domain is not empty
         {
             //获取域名的whois、解析IP信息 存入whoisInfo.txt 和reslovedIPInfo.txt
@@ -485,20 +401,10 @@ struct domain_IP_TTl_ clusterUsingDomainInfo::parsingDomainIPString(string line,
     {
         domianIPInfo.traingFlag = 2;//表示测试数据
     }
-    //cout<<"size:"<<domianIPInfo.IPList.size()<<endl;
-    /*
-    cout<<domianIPInfo.domainName<<",";
-    for(set<string>::iterator it = domianIPInfo.IPList.begin();it!=domianIPInfo.IPList.end();++it)
-    {
-        cout<<*it<<",";
-    }
-    cout<<domianIPInfo.elapseTime<<","<<domianIPInfo.isupdate<<","<<domianIPInfo.role<<",";
-    cout<<domianIPInfo.ipLocationEntroy<<","<<domianIPInfo.traingFlag<<endl;
-    */
     return domianIPInfo;
 }
 //读取训练数据、测试数据到map,便于特征提取//isTrainging == 0 traing file 1:test file
-map<int,vector<struct domain_IP_TTl_> >clusterUsingDomainInfo::getDomianFromInfoTestFile(
+map<int,vector<struct domain_IP_TTl_> > clusterUsingDomainInfo::getDomianFromInfoTestFile(
                                         const char *rFilebuff,bool isTrainging)
 {
     struct domain_IP_TTl_  tmpdomain_IP;
@@ -515,24 +421,15 @@ map<int,vector<struct domain_IP_TTl_> >clusterUsingDomainInfo::getDomianFromInfo
     }
     while(!fin.eof() ) //读文件，一次读取一行，解析相关字段内容，直到读到文件末尾。
     {
-        /*
-        counts++;
-        if(counts >5)
-        {
-            break;
-        }
-        */
         tmpdomain_IP.IPList.clear();
         tmpdomain_IP.domainName.clear();
         getline(fin, line);
-        //cout<<"line:"<<line<<endl;
         if(line.size() == 0 )
         {
             continue;
         }
         else
         {
-
             if(isTrainging == false)//test data
             {
                 size_t clabel = line.find_last_of(',');
@@ -562,7 +459,6 @@ map<int,vector<struct domain_IP_TTl_> >clusterUsingDomainInfo::getDomianFromInfo
                     {
                         //cout<<"dname:"<<dname<<endl;
                         tempdomaineVector.push_back(tmpdomain_IP);
-                        //cout<<"tempdomaineVector size():"<<tempdomaineVector.size()<<endl;
                         domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(cflag,tempdomaineVector));
                     }
 
@@ -580,26 +476,6 @@ map<int,vector<struct domain_IP_TTl_> >clusterUsingDomainInfo::getDomianFromInfo
     {
         domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(0,tempdomaineVector));
     }
-      /*
-    for(map<int,vector<struct domain_IP_TTl_> >::iterator iter = domain_IP_map.begin();iter != domain_IP_map.end();++iter)
-    {
-
-        cout<<"flag = "<<iter->first<<",nums = "<<iter->second.size()<<endl;
-
-        for(vector<struct domain_IP_TTl_>::iterator it = iter->second.begin(); it!= iter->second.end();++it)
-        {
-            cout<<it->domainName<<",";
-            for(set<string>::iterator its = it->IPList.begin(); its!= it->IPList.end();++its)
-            {
-                cout<<*its<<",";
-            }
-
-            cout<<it->elapseTime<<","<<it->isupdate<<","<<it->role<<","<<it->ipLocationEntroy;
-            cout<<","<<it->traingFlag<<endl;
-        }
-
-    }
-    */
     fin.close();
     return domain_IP_map;
 
@@ -623,19 +499,6 @@ int clusterUsingDomainInfo::getPrimaryDomianOwnerInfo(string domain,string key,
         cout<<"create file error:"<<reslovedIPfile<<endl;
         return 0;
     }
-    //char *domainPtr = NULL;
-    //domainPtr = (char*)domain.c_str();
-    //struct owner_Info_ curDomainInfo;
-    //string primaryDoamin;
-    //char *primaryDoaminPtr;
-    //primaryDoaminPtr = m_DGA_detection.get_primary_domain(domainPtr);
-    //if(primaryDoaminPtr == NULL)
-    //{
-        //cout<<"primaryDoamin is empty return"<<endl;
-        //return 0;
-    //}
-    //cout<<"primaryDoaminPtr:"<<primaryDoaminPtr<<endl;
-    //primaryDoamin.assign(primaryDoaminPtr);
     string file = fileLocation+"domain_report --apikey " + key + "  --report ";
     string domainLog = domain+">"+fileLocation+"domain.log";
     string domian_report = file + domainLog;
@@ -880,13 +743,11 @@ struct whoisInfo_  clusterUsingDomainInfo::processDataWhoisInfo(const char* whoi
             int mon;
             char time[3];
             int year, day,hour,min,sec;
-            //cout<<"Registry Expiry Date:"<<expire_time<<endl;
             if (sscanf(expire_time.c_str(), "%4d-%2d-%2d%1s%2d:%2d:%2d%1s",
                         &year,&mon,&day,month,&hour,&min,&sec,time) == 8)
             {
                 char str[20];
                 sprintf(str,"%d-%d-%d\n", day, mon, year);
-                //cout<<"expiredTime:"<<str<<endl;
                 expire_time.clear();
                 expire_time.assign(str);
                 traingDataWhois.expiredTime = MakeTime(expire_time);
@@ -898,7 +759,6 @@ struct whoisInfo_  clusterUsingDomainInfo::processDataWhoisInfo(const char* whoi
         }
         else if(pos=strstr(buf,"Expiration Date:")) //找到“过期时间”
         {
-            //cout<<"find Expiration Date:"<<endl;
             memset(info, 0,sizeof(info));
             tmp_pos=pos+strlen("Expiration Date:") +1;
             i=0;
@@ -911,7 +771,6 @@ struct whoisInfo_  clusterUsingDomainInfo::processDataWhoisInfo(const char* whoi
             info[i]='\0';
             expire_time.clear();
             expire_time.assign(info);
-            //cout<<"expire_time:"<<expire_time<<endl;
             char week[3];
             char month[3];
             int mon;
@@ -923,7 +782,6 @@ struct whoisInfo_  clusterUsingDomainInfo::processDataWhoisInfo(const char* whoi
                 //Date:29-Apr-2008 17:53:02 UTC
                 char str[20];
                 sprintf(str,"%d-%s-%d\n", day, month, year);
-                //cout<<"expire_time:"<<str<<endl;
                 expire_time.clear();
                 expire_time.assign(str);
                 traingDataWhois.expiredTime = MakeTime(expire_time);
@@ -933,7 +791,6 @@ struct whoisInfo_  clusterUsingDomainInfo::processDataWhoisInfo(const char* whoi
                 //Expiration Date:   2018-02-27
                 char str[20];
                 sprintf(str,"%d-%d-%d\n", day, mon, year);
-                //cout<<"expire_time::"<<str<<endl;
                 expire_time.clear();
                 expire_time.assign(str);
                 traingDataWhois.expiredTime = MakeTime(expire_time);
@@ -944,7 +801,6 @@ struct whoisInfo_  clusterUsingDomainInfo::processDataWhoisInfo(const char* whoi
                 //Date:Sun Mar 18 04:55:43 GMT 2007
                 char str[20];
                 sprintf(str,"%d-%s-%d\n", day, month, year);
-                //cout<<"expire_time:"<<str<<endl;
                 expire_time.clear();
                 expire_time.assign(str);
                 traingDataWhois.expiredTime = MakeTime(expire_time);
@@ -954,7 +810,6 @@ struct whoisInfo_  clusterUsingDomainInfo::processDataWhoisInfo(const char* whoi
                 //Expiration Date: 11-oct-2017
                 char str[20];
                 sprintf(str,"%d-%s-%d\n", day, month, year);
-                //cout<<"expiredTime:"<<str<<endl;
                 expire_time.clear();
                 expire_time.assign(str);
                 traingDataWhois.expiredTime = MakeTime(expire_time);
@@ -983,17 +838,11 @@ struct whoisInfo_  clusterUsingDomainInfo::processDataWhoisInfo(const char* whoi
 			info[i]='\0';
 			update_time.clear();
 			update_time.assign(info);
-			//cout<<"update_time:"<<update_time<<endl;
 			char week[3];
             char month[3];
             int mon;
             int year, day, hour, min, sec;
             char timezone[10];
-			//size_t lab = update_time.find_first_of('T');
-			//if(lab !=string::npos)
-            //{
-                //cout<<"update_11:"<<endl;
-                //string substring = expire_time.substr(0,lab);
             if (sscanf(update_time.c_str(), "%4d-%2d-%2d%1s%2d:%2d:%2d%1s",
                         &year,&mon,&day,week,&hour,&min,&sec,timezone) == 8)
             {
@@ -1126,7 +975,7 @@ void clusterUsingDomainInfo::outputDnsAbstractFile(const char *rFilebufAbstract,
     //过滤否则输出到文件
     m_DGA_detection.readDNSAbstractFile(rFilebufAbstract,wFilebufAbstract);
 }
-set<string>clusterUsingDomainInfo::readIPBlacklist(const char *rfilebuff)
+set<string> clusterUsingDomainInfo::readIPBlacklist(const char *rfilebuff)
 {
     set<string>ipBlackList;
     string line;
@@ -1151,12 +1000,6 @@ set<string>clusterUsingDomainInfo::readIPBlacklist(const char *rfilebuff)
         }
     }
     fin.close();
-    /*
-    for(set<string>::iterator it = ipBlackList.begin();it!=ipBlackList.end();++it)
-    {
-        cout<<"iplong:"<<*it<<endl;
-    }
-    */
     return ipBlackList;
 }
 //实现domain ：IP1，iP2...IPn 映射,过滤掉IP黑名单中的域名 ,
@@ -1490,7 +1333,7 @@ double clusterUsingDomainInfo::ngramValue(set<string>ngrams,Trie_node root)
     return average;
 }
 //基于提取得到的域名ngram，统计其在字典中出现的次数,得到其平均值、方差、中位数
-vector<double>clusterUsingDomainInfo::nGramAverageAnddeviationCalcu(set<string>ngrams,Trie_node root)
+vector<double> clusterUsingDomainInfo::nGramAverageAnddeviationCalcu(set<string>ngrams,Trie_node root)
 {
     vector<double> retal;
     vector<int>ngramNums;
@@ -1556,13 +1399,6 @@ double clusterUsingDomainInfo::medianCalcu(vector<int>ngramSet)
 {
     double median;
     sort(ngramSet.begin(),ngramSet.end());
-    /*
-    for(vector<int>::iterator it = ngramSet.begin(); it!= ngramSet.end();it++)
-    {
-        cout<< "tem value:"<<*it<<",";
-    }
-    cout<<endl;
-    */
     int n = ngramSet.size();
     if( n%2 == 1)
     {
@@ -1730,7 +1566,7 @@ time_t clusterUsingDomainInfo::MakeTime(string &str)
 	return timep;
 }
 //二级域名分组
-map<string,vector<string> >clusterUsingDomainInfo::secondLDGrouping(const char*rFilebuff)
+map<string,vector<string> > clusterUsingDomainInfo::secondLDGrouping(const char*rFilebuff)
 {
     map<string,vector<string> > m_dnameGrouping;
     m_dnameGrouping.clear();
@@ -1807,30 +1643,15 @@ map<string,vector<string> >clusterUsingDomainInfo::secondLDGrouping(const char*r
 
         }
     }
-    /*
-    cout<<"m_dnameGrouping size:"<<m_dnameGrouping.size()<<endl;
-    for(map<string,vector<string> >::iterator its = m_dnameGrouping.begin();
-        its != m_dnameGrouping.end();++its)
-    {
-            cout<<"secondLDs:"<<its->first<<",and its size:"<<its->second.size()<<endl;
-            for(vector<string>::iterator vits = its->second.begin(); vits!= its->second.end();
-                ++vits)
-            {
-                cout<<"domains:"<<*vits<<endl;
-            }
-    }
-    */
     return m_dnameGrouping;
 
 }
 void clusterUsingDomainInfo::featureVectorCalcu(map<int,vector<struct domain_IP_TTl_> >domainIpPara,
                                         Trie_node root,const char *wfilebuf,bool isTraing)
 {
-    //cout<<"domainIpPara.size:"<<domainIpPara.size()<<endl;
     for(map<int,vector<struct domain_IP_TTl_> >::iterator iter = domainIpPara.begin();
         iter != domainIpPara.end();++iter)
     {
-        //cout<<"iter->second size:"<<iter->second.size()<<endl;
         featureVectorCalculate(iter->second,root,wfilebuf,isTraing);
     }
 }
@@ -1866,14 +1687,6 @@ void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_
     //cout<<"domains size:"<<domains.size()<<endl;
     for(vector<struct domain_IP_TTl_>::iterator iter = domains.begin(); iter != domains.end();++iter)
     {
-
-        /*
-        counts++;
-        if(counts>2)
-        {
-            break;
-        }
-        */
         nLdDomainstruct = getDomainNLDs(iter->domainName);//提取二级域名及三级域名
         //ngram 计算
         sgramsOfsecLD =  n_GramFeatureCalcu(nLdDomainstruct.secondLD, 2);
@@ -1896,7 +1709,6 @@ void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_
         //计算数字比率
         perofSec = numericPercentageInDomain(nLdDomainstruct.secondLD);
         perofThir = numericPercentageInDomain(nLdDomainstruct.thirdLD);
-        //int Asnums = getIPLocation(iter->iplist);
         for(vector<double>::iterator it = ssAverDeviation.begin(); it!= ssAverDeviation.end();++it)
         {
             //2gram,2lD average median deviation;
@@ -1979,51 +1791,7 @@ trieTree* clusterUsingDomainInfo::getTrieTree()
 }
 clusterUsingDomainInfo::~clusterUsingDomainInfo()
 {
-    //cout<<"parents deconstructor:"<<endl;
     delete m_trieTree;
-    delete getIPInfo;
-    delete m_getDomainFromDatabase;
-}
-/*
-void clusterUsingDomainInfo::usingPythonGetTraingFile(const char *getIPpython,const char *getIPLocationpython)
-{
-    Py_Initialize();
-    if(!Py_IsInitialized())
-    {
-        exit(0);
-    }
-    PyRun_SimpleString("print \"Hello, world\"");
-    PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append('./')");
-    PyObject* pyParams1= Py_BuildValue("s",getIPpython);
-    ifstream fgetIP(getIPpython,ios::in);
-    if(fgetIP.is_open() && (PyRun_SimpleString("execfile('pyParams1')") != 0))
-    {
-        fgetIP.close();
-        cout<<"PyRun_SimpleFile failed!:"<<getIPpython<<endl;
-        exit(0);
-
-    }
-    PyObject* pyParams2= Py_BuildValue("s",getIPLocationpython);
-    ifstream fgetIPLocation(getIPLocationpython,ios::in);
-    if(fgetIPLocation.is_open() && (PyRun_SimpleString("execfile(pyParams2)") != 0))
-    {
-        fgetIPLocation.close();
-        cout<<"PyRun_SimpleFile failed!:"<<getIPLocationpython<<endl;
-        exit(0);
-
-    }
-    Py_Finalize();
-}
-*/
-void clusterUsingDomainInfo::getDomainInfoFromDataBase(const char *domainInfoFile)
-{
-    m_getDomainFromDatabase->connect_database();
-    m_getDomainFromDatabase->readDataInFile(domainInfoFile);
-}
-void clusterUsingDomainInfo::getDGADomainInfoFromDataBase()
-{
-    m_getDomainFromDatabase->getDGADomain();
 }
 //readFile,domainfile  过滤掉存在三级域名的文件，
 void clusterUsingDomainInfo::getZWWDomain(const char *readFile,const char *domainfile,
@@ -2074,10 +1842,6 @@ void clusterUsingDomainInfo::getZWWDomain(const char *readFile,const char *domai
                 {
                     fout2<<line<<endl;
                 }
-                //else
-                //{
-                    //fout<<line<<endl;
-                //}
             }
             else
             {
@@ -2087,40 +1851,6 @@ void clusterUsingDomainInfo::getZWWDomain(const char *readFile,const char *domai
 
         }
     }
-     /*
-    const char *tmpfile = "/home/xdzang/DGA_Detection/maliciousIDfile";
-    //m_getDomainFromDatabase->getWholeDomian_ID(domainfile,tmpfile);
-    //cout<<"size:"<<primayDo.size()<<endl;
-
-    cout<<"size:"<<domianID.size()<<endl;
-    ofstream fout(tmpfile,ios::out|ios::app);
-    for(vector<vector<int> >::iterator it = domianID.begin(); it != domianID.end();++it)
-    {
-        for(int i = 0;i < it->size();i++)
-        {
-            if(i + 1 == it->size())
-            {
-                fout<<it->at(i)<<endl;
-            }
-            else
-            {
-                fout<<it->at(i)<<",";
-            }
-        }
-
-
-
-    }
-
-   m_getDomainFromDatabase->getWholeDomian_ZWW(tmpfile,writeFile);
-*/
-}
-void clusterUsingDomainInfo::getIPLocation(const char *domainInfoFile,const char *wInfoFile,
-                                           bool istraing,bool isbenign)
-{
-    getIPInfo->connect_database();
-    getIPInfo->readIPLocationInIPCIS();
-    getIPInfo->getIPLocationNums(domainInfoFile,wInfoFile,getIPInfo->getInfo(),istraing,isbenign);
 }
 void clusterUsingDomainInfo::readFirstTenThoundsand(const char *readFile,const char *writeFile)
 {
@@ -2177,13 +1907,11 @@ void clusterUsingDomainInfo::getlostDoamin(const char *readFile,const char *rFil
     string line;
     ifstream fin (readFile,ios::in);
     ifstream fin2(rFilewhois,ios::in);
-    //ifstream fin3(rbadFile,ios::in);
     ofstream fout(wlostwrite,ios::out|ios::app);
     ofstream fout2(rbadFile,ios::out|ios::app);
     set<string>lost;
     set<string>domainwhois;
     map<string,string>domains;
-    //set<string>::iterator its;
     map<string,string>::iterator its;
     line.clear();
 
@@ -2218,54 +1946,13 @@ void clusterUsingDomainInfo::getlostDoamin(const char *readFile,const char *rFil
         }
         else
         {
-            //size_t lab = line.find_first_of(',');
-            //string domian = line.substr(0,lab);
             domainwhois.insert(line);
         }
     }
      cout<<"domains all size:"<<domainwhois.size()<<endl;
-/*
-    while(!fin3.eof() ) //读bad文件
-    {
-        getline(fin3, line);
-        if(line.size() == 0 )
-        {
-            continue;
-        }
-        else
-        {
-            size_t lab = line.find_first_of(',');
-            string domian = line.substr(0,lab);
-            domainwhois.insert(domian);
-        }
-    }
-
-    cout<<"all domian:"<<domains.size()<<",processDoamin:"<<domainwhois.size()<<endl;
-
-    for(map<string,string>::iterator iter = domains.begin();iter!=domains.end();++iter)
-    {
-        its = domainwhois.find(iter->first);
-        if(its == domainwhois.end())
-        {
-            fout<<iter->second<<endl;
-        }
-    }
-
-    for(set<string>::iterator iter = domainwhois.begin();iter!=domainwhois.end();++iter)
-    {
-        its = domains.find(*iter);
-        if(its == domains.end())
-        {
-            fout<<*iter<<endl;
-        }
-    }
-    for(map<string,string>::iterator it = domains.begin();it!= domains.end();it++)
-    {
-        fout2<<it->second<<endl;
-    }
-*/
 }
- void clusterUsingDomainInfo::domain3ldbigthanfive(map<string,vector<string> > paraGrouping,
+
+void clusterUsingDomainInfo::domain3ldbigthanfive(map<string,vector<string> > paraGrouping,
                                                    const char* wfilebuf)
 {
     ofstream fout(wfilebuf,ios::out|ios::app);
@@ -2395,8 +2082,6 @@ void clusterUsingDomainInfo::getResolvedIPSimilarityMatrix(const char *domain_ip
             tmpinsersection = ipMatrix.at(i)*ipMatrix.at(j);
             tmpunion =  ipMatrix.at(i)+ipMatrix.at(j);
             double  tmp = (double)tmpinsersection.size()/tmpunion.size();
-            //int valtmp = (int)(tmp*100);
-            //double val = (double)tmp/100;
             tempVec.push_back(tmp) ;
             tmpinsersection.clear();
             tmpunion.clear();
@@ -2483,12 +2168,6 @@ void clusterUsingDomainInfo::getThreeLevelDoamin(const char *Alexfile,const char
             }
         }
     }
-    /*
-    for(map<string,string>::iterator it = Alexfilemap.begin();it!=Alexfilemap.end();++it)
-    {
-        cout<<"Alexfilemap first = "<<it->first<<",second = "<<it->second<<endl;
-    }
-    */
     map<string,string>tmp;
     while(!fin2.eof())
     {
@@ -2504,12 +2183,6 @@ void clusterUsingDomainInfo::getThreeLevelDoamin(const char *Alexfile,const char
         }
 
     }
-    /*
-    for(set<string>::iterator it = AlexfileZWWset.begin();it!=AlexfileZWWset.end();++it)
-    {
-        cout<<"AlexfileZWWset element = "<<*it<<endl;
-    }
-    */
     for(set<string>::iterator iter = AlexfileZWWset.begin();iter!= AlexfileZWWset.end();++iter)
     {
         secondLevelDomain = m_DGA_detection.get_primary_domain( (char*)iter->c_str());
@@ -2521,16 +2194,9 @@ void clusterUsingDomainInfo::getThreeLevelDoamin(const char *Alexfile,const char
         }
 
     }
-    /*
-    for(map<string,string>::iterator it = tmp.begin();it!=tmp.end();++it)
-    {
-        cout<<"AlexfileZWWset first = "<<it->first<<",second = "<<it->second<<endl;
-    }
-    */
     map<string,string>::iterator it;
     for(map<string,string>::iterator its = Alexfilemap.begin();its != Alexfilemap.end();++its)
     {
-        //cout<<"first = "<<its->first<<",second = "<<its->second<<endl;
         it = tmp.find(its->first);
         if(it!= tmp.end())
         {
@@ -2731,18 +2397,29 @@ void clusterUsingDomainInfo::ngramCalcu(const char* rfilebuf,const char* wfilebu
 int main()
 {
     clusterUsingDomainInfo cluDomain;
-    vector<struct domain_IP_TTl_> traingfileVector;
     cluDomain.initFun();
-    map<string,vector<string> >testprimaryGrouping;
     map<int,vector<struct domain_IP_TTl_> >getWholeDomainInfo;
 
-
     //获取整个域名信息 计算特征向量
-    /*
+    // getWholeDomainInfo = cluDomain.getDomianFromInfoTestFile(
+    //                     "./domainfilecluester_7w",false);
     getWholeDomainInfo = cluDomain.getDomianFromInfoTestFile(
-                        "/home/xdzang/DGA_Detection/domainfilecluester_7w",false);
+                        "../../data/TrainSet/Malicious_10000",false);
     cluDomain.featureVectorCalcu(getWholeDomainInfo,cluDomain.getTrieTree()->getTrieTreeRoot(),
-                            "/home/xdzang/DGA_Detection/domainfilecluester_7w_features",false);
-    */
+                            "./features",false);
+    
     return 0;
 }
+// extern "C" {
+//     clusterUsingDomainInfo obj;
+
+//     void init()
+//     {
+//         return obj.InitFun();
+//     }
+
+//     char* getPrimaryDomain(const char* str)
+//     {
+//         return obj.get_primary_domain(str);
+//     }
+// }
