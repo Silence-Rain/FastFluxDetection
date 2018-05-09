@@ -1415,14 +1415,14 @@ void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_
             //2gram,2lD average median deviation;
             temp.push_back(*it);
         }
-        for(vector<double>::iterator it = tsAverDeviation.begin(); it!= tsAverDeviation.end();++it)
-        {
-            //2gram,3lD average median deviation;
-            temp.push_back(*it);
-        }
         for(vector<double>::iterator it = stAverDeviation.begin(); it!= stAverDeviation.end();++it)
         {
             //3gram,2lD average median deviation;
+            temp.push_back(*it);
+        }
+        for(vector<double>::iterator it = tsAverDeviation.begin(); it!= tsAverDeviation.end();++it)
+        {
+            //2gram,3lD average median deviation;
             temp.push_back(*it);
         }
         for(vector<double>::iterator it = ttAverDeviation.begin(); it!= ttAverDeviation.end();++it)
@@ -1432,16 +1432,10 @@ void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_
         }
         temp.push_back(secLDEntroy);
         temp.push_back(thirLDEntroy);
-        //temp.push_back(double(countNLDs));
         temp.push_back(double(lenofsLD));
         temp.push_back(double(lenoftLD));
-        temp.push_back(double(lenofDomain));
         temp.push_back(perofSec);
         temp.push_back(perofThir);
-        // temp.push_back(double(iter->elapseTime));
-        // temp.push_back(double(iter->isupdate));
-        // temp.push_back(double(iter->role));
-        // temp.push_back(iter->ipLocationEntroy);
         if(isTraing == true)
         {
             temp.push_back((double)iter->traingFlag);
