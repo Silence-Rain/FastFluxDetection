@@ -20,7 +20,6 @@ void clusterUsingDomainInfo::alexTopAMillionProcess(const char *rFilebuff,const 
     string line;
     while(!fin.eof() ) //读文件，一次读取一行，解析相关字段内容，直到读到文件末尾。
     {
-        //counts++;
         getline(fin, line);
         if(line.size() == 0 )
         {
@@ -84,8 +83,8 @@ u_long clusterUsingDomainInfo::ip2long(const char *ip)
     return  iplong;
 }
 
-//解析line 得到 域名 -IP -time -isupdate isTrainging is false after cluster get features
-struct domain_IP_TTl_ clusterUsingDomainInfo::parsingDomainIPString(string line,bool isTrainging)
+//解析line 得到 域名 -IP -time -isupdate isTraining is false after cluster get features
+struct domain_IP_TTl_ clusterUsingDomainInfo::parsingDomainIPString(string line,bool isTraining)
 {
     //提取域名，插入到容器中
     struct domain_IP_TTl_ domianIPInfo;
@@ -168,7 +167,7 @@ struct domain_IP_TTl_ clusterUsingDomainInfo::parsingDomainIPString(string line,
         //cout<<"domianIPInfo.ipLocationEntroy:"<<domianIPInfo.ipLocationEntroy<<endl;
     }
 
-    if(isTrainging == true)
+    if(isTraining == true)
     {
         domianIPInfo.traingFlag = traingDataFlag;
     }
@@ -177,82 +176,6 @@ struct domain_IP_TTl_ clusterUsingDomainInfo::parsingDomainIPString(string line,
         domianIPInfo.traingFlag = 2;//表示测试数据
     }
     return domianIPInfo;
-}
-//读取训练数据、测试数据到map,便于特征提取//isTrainging == 0 traing file 1:test file
-map<int,vector<struct domain_IP_TTl_> > clusterUsingDomainInfo::getDomianFromInfoTestFile(
-                                        const char *rFilebuff,bool isTrainging)
-{
-    struct domain_IP_TTl_  tmpdomain_IP;
-    vector<struct domain_IP_TTl_> tempdomaineVector;
-    map<int,vector<struct domain_IP_TTl_> >domain_IP_map;
-    int counts = 0;
-    string line;
-    string dname;
-    ifstream fin(rFilebuff,ios::in);
-    if(!fin.is_open())
-    {
-        cout<<"open rfile:"<<rFilebuff<<":error:"<<endl;
-		exit(0);
-    }
-    while(!fin.eof() ) //读文件，一次读取一行，解析相关字段内容，直到读到文件末尾。
-    {
-        tmpdomain_IP.IPList.clear();
-        tmpdomain_IP.domainName.clear();
-        getline(fin, line);
-        if(line.size() == 0 )
-        {
-            continue;
-        }
-        else
-        {
-            if(isTrainging == false)//test data
-            {
-                size_t clabel = line.find_last_of(',');
-                string cluster = line.substr(clabel + 1, line.length());
-                int cflag = atoi(cluster.c_str());
-                tmpdomain_IP = parsingDomainIPString(line,isTrainging);
-                if(domain_IP_map.size() == 0)
-                {
-                    tempdomaineVector.push_back(tmpdomain_IP);
-                    domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(cflag,tempdomaineVector));
-                    tempdomaineVector.clear();
-                }
-                else
-                {
-                    map<int,vector<struct domain_IP_TTl_> >::iterator its = domain_IP_map.find(cflag);
-                    if(its != domain_IP_map.end())//类标存在
-                    {
-                        struct domain_IP_TTl_  curdomain_IP;
-                        curdomain_IP = tmpdomain_IP;
-                        vector<struct domain_IP_TTl_> curdomaineVector = its->second;
-                        curdomaineVector.push_back(curdomain_IP);
-                        domain_IP_map.erase(cflag);
-                        domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(cflag,curdomaineVector));
-
-                    }
-                    else
-                    {
-                        tempdomaineVector.push_back(tmpdomain_IP);
-                        domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(cflag,tempdomaineVector));
-                    }
-
-                }
-            }
-            else
-            {
-                tmpdomain_IP = parsingDomainIPString(line,isTrainging);
-                tempdomaineVector.push_back(tmpdomain_IP);
-            }
-        }
-
-    }
-    if(isTrainging == true)
-    {
-        domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(0,tempdomaineVector));
-    }
-    fin.close();
-    return domain_IP_map;
-
 }
 void clusterUsingDomainInfo::outputDnsAbstractFile(const char *rFilebufAbstract,
                                                    const char *wFilebufAbstract)
@@ -769,8 +692,6 @@ double clusterUsingDomainInfo::numericPercentageInDomain(string domainName)
             }
         }
         percentage = double(counts)/domainName.length();
-        // int tmp = int(percent*100);
-        // percentage = double(tmp)/100;
     }
     else
     {
@@ -1560,7 +1481,7 @@ void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_
     double perofThir;
     nLdDomainLevel nLdDomainstruct;
     int counts = 0;
-    ofstream fout(wfilebuf, ios::out);
+    ofstream fout(wfilebuf, ios::out|ios::app);
     if(!fout.is_open())
     {
         cout<<"create featureVector file error"<<endl;
@@ -1569,6 +1490,7 @@ void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_
     for(vector<struct domain_IP_TTl_>::iterator iter = domains.begin(); iter != domains.end();++iter)
     {
         nLdDomainstruct = getDomainNLDs(iter->domainName);//提取二级域名及三级域名
+
         //ngram 计算
         sgramsOfsecLD =  n_GramFeatureCalcu(nLdDomainstruct.secondLD, 2);
         sgramsOfthirLD = n_GramFeatureCalcu(nLdDomainstruct.thirdLD, 2);
@@ -1666,6 +1588,82 @@ void clusterUsingDomainInfo::featureVectorCalculate(vector<struct domain_IP_TTl_
     }
     fout.close();
 }
+//读取训练数据、测试数据到map,便于特征提取//isTraining == 0 traing file 1:test file
+map<int,vector<struct domain_IP_TTl_> > clusterUsingDomainInfo::getDomainFromInfoTestFile(
+                                        const char *rFilebuff,bool isTraining)
+{
+    struct domain_IP_TTl_  tmpdomain_IP;
+    vector<struct domain_IP_TTl_> tempdomaineVector;
+    map<int,vector<struct domain_IP_TTl_> >domain_IP_map;
+    int counts = 0;
+    string line;
+    string dname;
+    ifstream fin(rFilebuff,ios::in);
+    if(!fin.is_open())
+    {
+        cout<<"open rfile:"<<rFilebuff<<":error:"<<endl;
+        exit(0);
+    }
+    while(!fin.eof() ) //读文件，一次读取一行，解析相关字段内容，直到读到文件末尾。
+    {
+        tmpdomain_IP.IPList.clear();
+        tmpdomain_IP.domainName.clear();
+        getline(fin, line);
+        if(line.size() == 0 )
+        {
+            continue;
+        }
+        else
+        {
+            if(isTraining == false)//test data
+            {
+                size_t clabel = line.find_last_of(',');
+                string cluster = line.substr(clabel + 1, line.length());
+                int cflag = atoi(cluster.c_str());
+                tmpdomain_IP = parsingDomainIPString(line,isTraining);
+                if(domain_IP_map.size() == 0)
+                {
+                    tempdomaineVector.push_back(tmpdomain_IP);
+                    domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(cflag,tempdomaineVector));
+                    tempdomaineVector.clear();
+                }
+                else
+                {
+                    map<int,vector<struct domain_IP_TTl_> >::iterator its = domain_IP_map.find(cflag);
+                    if(its != domain_IP_map.end())//类标存在
+                    {
+                        struct domain_IP_TTl_  curdomain_IP;
+                        curdomain_IP = tmpdomain_IP;
+                        vector<struct domain_IP_TTl_> curdomaineVector = its->second;
+                        curdomaineVector.push_back(curdomain_IP);
+                        domain_IP_map.erase(cflag);
+                        domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(cflag,curdomaineVector));
+
+                    }
+                    else
+                    {
+                        tempdomaineVector.push_back(tmpdomain_IP);
+                        domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(cflag,tempdomaineVector));
+                    }
+
+                }
+            }
+            else
+            {
+                tmpdomain_IP = parsingDomainIPString(line,isTraining);
+                tempdomaineVector.push_back(tmpdomain_IP);
+            }
+        }
+
+    }
+    if(isTraining == true)
+    {
+        domain_IP_map.insert(make_pair<int,vector<struct domain_IP_TTl_> >(0,tempdomaineVector));
+    }
+    fin.close();
+    return domain_IP_map;
+
+}
 void testMap(map<int,vector<struct domain_IP_TTl_> > m)
 {
     for (map<int,vector<struct domain_IP_TTl_> >::iterator iter = m.begin();
@@ -1690,8 +1688,8 @@ extern "C" {
 
     void getFeatureVector(const char* rfile, const char* wfile)
     {
-        domainMap = obj.getDomianFromInfoTestFile(rfile, false);
-        //testMap(domainMap);
+        domainMap = obj.getDomainFromInfoTestFile(rfile, false);
+        // testMap(domainMap);
         obj.featureVectorCalcu(domainMap, obj.getTrieTree()->getTrieTreeRoot(), wfile, false);
     }
 

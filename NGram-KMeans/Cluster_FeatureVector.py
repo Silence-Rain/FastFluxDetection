@@ -1,9 +1,10 @@
 #!coding=utf8
 
 from ctypes import *
+import io
 import numpy as numpy
-from sklearn.cluster import KMeans
-from utils import plot
+# from sklearn.cluster import KMeans
+# from utils import plot
 
 get_feature_vector = None
 
@@ -21,8 +22,25 @@ def initCppLibs():
 
 	init()		# 接口内部初始化
 
+# C++接口所得结果去重
+def dereplicate(rfile):
+	ret = []
+	ret_label = []
+	cnt = 0
+	with io.open(rfile, "r") as f:
+		for line in f.readlines():
+			label = line.split(",")[0]
+			if label not in ret_label:
+				ret_label.append(label)
+				ret.append(line)
+		print(cnt)
+	with io.open(rfile, "w") as f:
+		for line in ret:
+			f.write(line)
+
 if __name__ == '__main__':
-	initCppLibs()
-	r = "data/TrainSet/Malicious_more60".encode("utf-8")
-	w = "data/t1".encode("utf-8")
-	get_feature_vector(r, w)
+	# initCppLibs()
+	# r1 = "data/TrainSet/Malicious_Test".encode("utf-8")
+	w1 = "data/feature_test".encode("utf-8")
+	# get_feature_vector(r1, w1)
+	dereplicate(w1)

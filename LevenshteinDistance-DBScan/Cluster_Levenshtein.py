@@ -2,10 +2,10 @@
 
 import time
 from ctypes import *
-import Levenshtein
-import numpy as np
-from sklearn.cluster import DBSCAN
-from utils import plot
+#import Levenshtein
+#import numpy as np
+#from sklearn.cluster import DBSCAN
+#from utils import plot
 
 getPrimaryDomain = None
 
@@ -171,7 +171,7 @@ if __name__ == '__main__':
 	initCppLibs()
 	
 	# clusterDomains("data/domainData_Test.dat", "data/domainData_clustered.dat", 1)
-	get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl1.dat")
+	get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl.dat")
 	# getLevenshteinDistOf2dl3dl("data/domain_2dl3dl.dat", "data/domain_2dl3dl_levenshteinDist_1.dat")
 	# dbscanOfLevenshteinDist("data/domain_2dl3dl_levenshteinDist_1.dat", "data/domain_2dl_dbscan.dat", 0)
 

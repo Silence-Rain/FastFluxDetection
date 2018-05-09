@@ -128,14 +128,20 @@ char* DGA_detection::get_primary_domain(char* dname)
     {
         domain_name_str[index] = tolower(dname[index]);
     }
-
 	//去除含有特殊字符的域名
 	for(index = 0; index < domain_name_len; index++)
 	{
-		if( ( (dname[index]>='0') && (dname[index]<='9') )  ||  ( (dname[index]>='a') && (dname[index]<='z') )  ||  ( (dname[index]>='A') && (dname[index]<='Z') )  ||  (dname[index]=='.')  ||  (dname[index]=='-')  ||  (dname[index]=='_')  )
+		if(((dname[index]>='0') && (dname[index]<='9')) 
+			|| ((dname[index]>='a') && (dname[index]<='z')) 
+			|| ((dname[index]>='A') && (dname[index]<='Z')) || (dname[index]=='.')
+			|| (dname[index]=='-') || (dname[index]=='_'))
         {
 			domain_name_str[index]=tolower(dname[index]);
         }
+		else if (dname[index] == '\r')
+		{
+			break;
+		}
 		else
 		{
 			return NULL;

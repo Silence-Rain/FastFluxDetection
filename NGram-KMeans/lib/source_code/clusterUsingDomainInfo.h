@@ -67,7 +67,7 @@ class clusterUsingDomainInfo
         ~clusterUsingDomainInfo();
         void alexTopAMillionProcess(const char *rFilebuff,const char *wFilebuff);
         void filterMaliciousDomains(const char *rFilebuff,const char *wFilebuff);
-        map<int,vector<struct domain_IP_TTl_> > getDomianFromInfoTestFile(const char *rFilebuff,bool isTrainging);
+        map<int,vector<struct domain_IP_TTl_> > getDomainFromInfoTestFile(const char *rFilebuff,bool isTraining);
         time_t MakeTime(string &str);
         void normalizeDict(const char *rFilebuf, const char *wFilebuf);
         void processorDomainFile(const char *rFilebuf,const char *ipblackfi,
@@ -90,7 +90,7 @@ class clusterUsingDomainInfo
         double medianCalcu(vector<int>ngramSet);
         trieTree* getTrieTree();
         u_long ip2long(const char *ip);
-        struct domain_IP_TTl_ parsingDomainIPString(string line,bool isTrainging);
+        struct domain_IP_TTl_ parsingDomainIPString(string line,bool isTraining);
         void featureVectorCalcu(map<int,vector<struct domain_IP_TTl_> >domainIpPara,Trie_node root,
                                 const char *wfilebuf,bool isTraing);
         set<string> readIPBlacklist(const char *rfilebuff);
