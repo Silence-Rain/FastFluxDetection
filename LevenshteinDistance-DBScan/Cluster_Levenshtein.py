@@ -18,6 +18,7 @@ def initCppLibs():
 	# 生成函数指针
 	init = lib.init
 	getPrimaryDomain = lib.getPrimaryDomain
+	getPrimaryDomain.argtypes = [c_char_p]
 	getPrimaryDomain.restype = c_char_p
 
 	init()		# 接口内部初始化
@@ -28,7 +29,7 @@ def initCppLibs():
 # 结果写入到wfile中，每行格式：[domainName, [ip1, ip2, ...], ttl, firstTime]
 def clusterDomains(rfile, wfile, window):
 	ret = [[""]]    			# 最终写入结果
-	curTime = int(time.time())	# 1505115195
+	curTime = int(time.time())
 
 	with open(rfile, "r") as f:
 		res = f.readlines()
@@ -65,14 +66,16 @@ def get2dl3dl(rfile, wfile):
 	ret = []
 
 	with open(rfile, "r") as f:
-		for line in f.readlines():
-			name = eval(line)[0]	# 每行第一个字段是全域名
+		for line in f.readlines()[:10]:
+			name = line.strip()
+			name_byte = name.encode("utf-8")
+			# name = eval(line)[0]	# 每行第一个字段是全域名
 			
-			pd = str(getPrimaryDomain(name))				# 主域名
+			pd = getPrimaryDomain(name).decode()			# 主域名
 			dl2 = pd.split(".")[0]							# 二级域标签
-			dl3 = name[:-(len(pd) + 1)].split(".")[-1]		# 三级域标签
+			dl3 = name.decode()[:-(len(pd) + 1)].split(".")[-1]		# 三级域标签
 			
-			ret.append((name, dl2, dl3))
+			ret.append((name.decode(), dl2, dl3))
 
 	with open(wfile, "w") as f:
 		for item in ret:
@@ -128,51 +131,71 @@ def dbscanOfLevenshteinDist(rfile, wfile, mode):
 	with open(rfile, "r") as f:
 		lines = f.readlines()
 
-		# 只取出n*n编辑距离矩阵的上三角部分（不含对角线），放入raw
-		# 得到的数据格式：[[dn0 with dn1, dn0 with dn2, ...], [dn1 with dn2, ...], ...]
-		for i in range(len(lines) - 1):
-			dat = eval(lines[i])
+		for line in lines:
 			temp = []
 
-			for j in range(i + 1, len(lines)):
-				temp.append(dat[j][mode])	# 根据mode读入对应标签的编辑距离
+			for item in eval(line):
+				if len(item) != 0:
+					temp.append(item[0])
+				else:
+					temp.append(0)
 
 			raw.append(temp)
 
-	# 关联编辑距离对和其域名下标
-	# 得到的数据格式：[[i, j, dni with dnj], ...]
-	# 域名下标 => domainData_clustered.dat文件中域名对应的行数
-	res = []
-	for i in range(len(raw)):
-		for j in range(len(raw)-i):
-			res.append([i, i+1+j, raw[i][j]])
-	res = np.array(res)
+		# # 只取出n*n编辑距离矩阵的上三角部分（不含对角线），放入raw
+		# # 得到的数据格式：[[dn0 with dn1, dn0 with dn2, ...], [dn1 with dn2, ...], ...]
+		# for i in range(len(lines) - 1):
+		# 	dat = eval(lines[i])
+		# 	temp = []
 
-	clst = DBSCAN(eps=0.5, min_samples=10)
-	labels = clst.fit_predict(res[:,2].reshape(-1, 1))
+		# 	for j in range(i + 1, len(lines)):
+		# 		temp.append(dat[j][mode])	# 根据mode读入对应标签的编辑距离
+
+		# 	raw.append(temp)
+
+	# # 关联编辑距离对和其域名下标
+	# # 得到的数据格式：[[i, j, dni with dnj], ...]
+	# # 域名下标 => domainData_clustered.dat文件中域名对应的行数
+	# res = []
+	# for i in range(len(raw)):
+	# 	for j in range(len(raw)-i):
+	# 		res.append([i, i+1+j, raw[i][j]])
+	# res = np.array(res)
+
+	clst = DBSCAN(eps=3, metric="precomputed", min_samples=3)
+	labels = clst.fit_predict(raw)
+	# labels = clst.fit_predict(res[:,2].reshape(-1, 1))
 	print("Current label: %s" % ("secondary" if mode == 0 else "ternary"))
 	print("Cluster types: %d" % (max(labels) + 2))	# 要加上-1，0两个类型
 	print("Core samples' num: %d" % len(clst.core_sample_indices_))
 
+	res = [[] for x in range(int(max(labels)) + 2)]
+	for index, i in enumerate(labels):
+		res[i+1].append(index+1)
+
+	print(res[1:])
+
+
 	# # 作出聚类后数据的3D散点图
 	# plot.plot_3d_scatter(res, labels)
-	# plot.plot_scatter(res[:,:2], labels)
+	# plot.plot_scatter(np.array(raw), labels)
 
-	# 按照DBSCAN的聚类结果，将编辑距离对分类。结果写入wfile
-	ret = [[] for x in range(max(labels)+2)]
-	for i in range(len(labels)):
-		ret[labels[i]].append(tuple(res[i][:-1]))
+	# # 按照DBSCAN的聚类结果，将编辑距离对分类。结果写入wfile
+	# ret = [[] for x in range(max(labels)+2)]
+	# for i in range(len(labels)):
+	# 	ret[labels[i]].append(tuple(res[i][:-1]))
 
-	with open(wfile, "w") as f:
-		for item in ret:
-			f.write(str(item) + "\n")
+	# with open(wfile, "w") as f:
+	# 	for item in ret:
+	# 		f.write(str(item) + "\n")
+
 
 
 if __name__ == '__main__':
-	# initCppLibs()
+	initCppLibs()
 	
 	# clusterDomains("data/domainData_Test.dat", "data/domainData_clustered.dat", 1)
-	# get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl.dat")
+	get2dl3dl("data/Malicious_Test.dat", "data/malicious_test_2dl3dl.dat")
 	# getLevenshteinDistOf2dl3dl("data/domain_2dl3dl.dat", "data/domain_2dl3dl_levenshteinDist_1.dat")
-	dbscanOfLevenshteinDist("data/domain_2dl3dl_levenshteinDist_1.dat", "data/domain_2dl_dbscan.dat", 0)
+	# dbscanOfLevenshteinDist("data/domain_2dl3dl_levenshteinDist_1.dat", "data/domain_2dl_dbscan.dat", 0)
 
