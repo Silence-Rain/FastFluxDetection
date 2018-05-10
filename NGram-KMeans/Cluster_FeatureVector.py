@@ -63,7 +63,7 @@ def KMeansOfFeatureVector(rfile, wfile, mode=0):
 	ret = np.hstack((res[:,:1], labels.reshape(-1, 1)))
 	with io.open(wfile, "w") as f:
 		for item in ret:
-			f.write(str(item) + "\n")
+			f.write(str(list(item)) + "\n")
 
 
 if __name__ == '__main__':
