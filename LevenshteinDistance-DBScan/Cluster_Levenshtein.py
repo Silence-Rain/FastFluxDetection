@@ -2,10 +2,10 @@
 
 import time
 from ctypes import *
-#import Levenshtein
-#import numpy as np
-#from sklearn.cluster import DBSCAN
-#from utils import plot
+import Levenshtein
+import numpy as np
+from sklearn.cluster import DBSCAN
+from utils import plot
 
 getPrimaryDomain = None
 
@@ -150,12 +150,13 @@ def dbscanOfLevenshteinDist(rfile, wfile, mode):
 
 	clst = DBSCAN(eps=0.5, min_samples=10)
 	labels = clst.fit_predict(res[:,2].reshape(-1, 1))
-	print("Current label: %s") % ("secondary" if mode == 0 else "ternary")
+	print("Current label: %s" % ("secondary" if mode == 0 else "ternary"))
 	print("Cluster types: %d" % (max(labels) + 2))	# 要加上-1，0两个类型
 	print("Core samples' num: %d" % len(clst.core_sample_indices_))
 
 	# # 作出聚类后数据的3D散点图
 	# plot.plot_3d_scatter(res, labels)
+	# plot.plot_scatter(res[:,:2], labels)
 
 	# 按照DBSCAN的聚类结果，将编辑距离对分类。结果写入wfile
 	ret = [[] for x in range(max(labels)+2)]
@@ -168,10 +169,10 @@ def dbscanOfLevenshteinDist(rfile, wfile, mode):
 
 
 if __name__ == '__main__':
-	initCppLibs()
+	# initCppLibs()
 	
 	# clusterDomains("data/domainData_Test.dat", "data/domainData_clustered.dat", 1)
-	get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl.dat")
+	# get2dl3dl("data/domainData_clustered.dat", "data/domain_2dl3dl.dat")
 	# getLevenshteinDistOf2dl3dl("data/domain_2dl3dl.dat", "data/domain_2dl3dl_levenshteinDist_1.dat")
-	# dbscanOfLevenshteinDist("data/domain_2dl3dl_levenshteinDist_1.dat", "data/domain_2dl_dbscan.dat", 0)
+	dbscanOfLevenshteinDist("data/domain_2dl3dl_levenshteinDist_1.dat", "data/domain_2dl_dbscan.dat", 0)
 
