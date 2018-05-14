@@ -1,5 +1,9 @@
 # FastFluxDetection
-A fast-flux domains' detection and judgement mechanism based on Levenshtein algorithm
+A fast-flux domains' detection and judgement mechanism
+
+Using DBScan and KMeans algorithms to determine the type of generation algorithm
+
+Using OS-ELM to categorize fast-flux and non-fast-flux domains
 
 ## 实现模块
 
