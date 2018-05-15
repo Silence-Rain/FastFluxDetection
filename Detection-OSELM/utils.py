@@ -2,9 +2,13 @@
 
 import time
 
+# 计算地理分布的香农熵
 def shannon_entropy():
 	pass
 
+# 计算whois测度信息
+# 参数：原始whois信息
+# 返回值：{是否过期，信息完整的字段数}
 def whois_analysis(info):
 	ret = {"is_expire": False, "item_complete": 0}
 

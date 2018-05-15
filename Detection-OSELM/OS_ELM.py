@@ -2,6 +2,8 @@
 
 import numpy as np
 
+# 在线顺序极限学习机
+# 构造参数：隐层节点数，输入节点数
 class OS_ELM(object):
 	def __init__(self, hidden_neuron, input_neuron):
 		self.num_hidden_neurons = hidden_neuron
@@ -12,64 +14,77 @@ class OS_ELM(object):
 		self.M = None
 		self.beta = None
 
-	def sig(self, tData, Iw, bias, num):
-		'''
-		tData:样本矩阵：样本数*特征数
-		Iw:输入层到第一个隐含层的权重：隐含层神经元数*特整数
-		bias:偏置1*隐含神经元个数
-		'''
-		v = tData * Iw.T	#样本数*隐含神经元个数
-		bias_1 = np.ones((num, 1)) * bias
+	# 激活函数
+	# 参数：tData: 样本矩阵
+	#	Iw: 输入层权重
+	#	bias: 隐层单元偏置
+	# 返回值：隐层输出矩阵
+	def sig(self, tData, Iw, bias):
+		#样本数*隐含神经元个数
+		v = tData * Iw.T
+		bias_1 = np.ones((len(tData), 1)) * bias
 		v = v + bias_1
 		H = 1./(1 + np.exp(-v))
 		return H
 
+	# 使用初始数据训练网络
+	# 参数：初始训练数据（np.array）
+	# 返回值：训练后的网络
 	def fit_init(self, data):
 		label = []
 		matrix = []
-		# 处理训练样本
 		for row in data:
+			# 记录样本label
 			temp = []
 			label.append(int(row[1]))
-			# 处理特征
+			# 获取特征数据
 			for item in row[2:]:
 				temp.append(item)
 			matrix.append(temp)
 		
-		# 开始训练
 		p0 = np.mat(matrix)
 		T0 = np.zeros((len(matrix), 7))
 		# 处理样本标签
 		for index, item in enumerate(label):
 			T0[index][item - 1] = 1
 		T0 = T0 * 2 - 1
-		# 样本数*隐含神经元个数
-		H0 = self.sig(p0, self.Iw, self.bias, len(matrix))
+		# 计算隐层输出矩阵
+		H0 = self.sig(p0, self.Iw, self.bias)
 		self.M = (H0.T * H0).I
+		# 计算输出权重
 		self.beta = self.M * H0.T * T0
 
 		return self
 
+	# 使用在线数据更新网络
+	# 参数：在线训练数据（np.array）
+	# 返回值：更新后的网络
 	def fit_train(self, data):
+		# 逐条使用数据，对网络进行更新
 		for row in data:
 			Tn = np.zeros((1, 7))
 			# 处理样本标签
 			b = int(row[1])
 			Tn[0][b - 1] = 1
 			Tn = Tn * 2 - 1
-			# 处理特征
+			# 获取特征数据
 			matrix = []
 			for item in row[2:]:
 				matrix.append(item)
 			pn = np.mat(matrix)
-			H = self.sig(pn, self.Iw, self.bias, 1)
+			# 更新隐层输出矩阵
+			H = self.sig(pn, self.Iw, self.bias)
 			self.M = self.M - self.M * H.T * (np.eye(1,1) + H * self.M * H.T).I * H * self.M
+			# 更新输出权重
 			self.beta = self.beta + self.M * H.T * (Tn - H * self.beta)
 
 		self.error_calc(data)
 
 		return self
 
+	# 使用现有模型对数据分类
+	# 参数：需要分类的数据（np.array）
+	# 返回值：数据的label列
 	def predict(self, data):
 		ret = []
 		for row in data:
@@ -78,15 +93,16 @@ class OS_ELM(object):
 			for item in row[2:]:
 				matrix.append(item)
 			p = np.mat(matrix)
-			HTrain = self.sig(p, self.Iw, self.bias, 1)
+			HTrain = self.sig(p, self.Iw, self.bias)
 			Y = HTrain * self.beta
-			# 判断
+			# 返回预测label
 			ret.append(argmax(Y) + 1)
 
 		return np.array(ret).reshape(-1, 1)
 
+	# 计算训练的误差值
+	# 参数：训练数据
 	def error_calc(self, data):
-		# 计算训练误差
 		correct = 0
 		sum = 0
 		for row in data:
@@ -95,9 +111,9 @@ class OS_ELM(object):
 			for item in row[2:]:
 				matrix.append(item)
 			p = np.mat(matrix)
-			HTrain = self.sig(p, self.Iw, self.bias, 1)
+			HTrain = self.sig(p, self.Iw, self.bias)
 			Y = HTrain * self.beta
-			# 判断
+			# 若预测结果和实际结果相同则计数
 			if np.argmax(Y) + 1 == int(row[1]):
 				correct += 1
 			sum += 1

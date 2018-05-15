@@ -4,6 +4,7 @@ from mysql import MySQL
 from ctypes import *
 from config import *
 
+# 获取域名测度信息的model
 class DetailModel(object):
 	def __init__(self):
 		self.ipcis = MySQL(
@@ -20,6 +21,7 @@ class DetailModel(object):
 			db=DNS_DB
 			)
 
+	# 初始化C++动态库接口
 	def initCppLib(self):
 		ll = cdll.LoadLibrary
 		lib = ll("lib/libPrimaryDomain.so")
@@ -30,6 +32,9 @@ class DetailModel(object):
 
 		init()
 
+	# 获取域名TTL
+	# 参数：全域名
+	# 返回值：TTL值（第一条记录）
 	async def get_ttl(self, domain):
 		pd = self.getPrimaryDomain(domain.encode("utf-8")).decode()
 		sql = "SELECT ttl FROM domain_name WHERE primary_domain='%s';" % pd
@@ -37,13 +42,19 @@ class DetailModel(object):
 
 		return int(rs[0])
 
+	# 获取域名whois信息
+	# 参数：全域名
+	# 返回值：[whois信息]
 	async def get_whois(self, domain):
 		pd = self.getPrimaryDomain(domain.encode("utf-8")).decode()
 		sql = "SELECT * FROM domain_whois WHERE primary_domain='%s';" % pd
 		rs = self.dns.get(sql)
 
-		return list(rs[0])
+		return list(rs)
 
+	# 获取域名解析IP
+	# 参数：全域名
+	# 返回值：[解析IP]
 	async def get_ip(self, domain):
 		sql = "SELECT ip FROM resolved_ip WHERE domain_name='%s" % domain
 		rs = self.dns.query(sql)
@@ -53,6 +64,9 @@ class DetailModel(object):
 
 		return ret
 
+	# 获取域名解析IP地理位置
+	# 参数：[解析IP]
+	# 返回值：{ip:(lng, lat)...}
 	async def get_ip_location(self, ips):
 		ret = {}
 		for ip in ips:
