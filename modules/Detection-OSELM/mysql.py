@@ -1,6 +1,9 @@
 #coding: utf8
 
-import MySQLdb
+try:
+	import MySQLdb
+except ImportError:
+	import pymysql as MySQLdb
 
 # MySQL连接对象
 # 定义了基本数据库操作

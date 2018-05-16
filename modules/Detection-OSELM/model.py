@@ -7,19 +7,19 @@ from config import *
 # 获取域名测度信息的model
 class DetailModel(object):
 	def __init__(self):
-		self.ipcis = MySQL(
-			host=IPCIS_HOST,
-			user=IPCIS_USER,
-			passwd=IPCIS_PASSWD,
-			db=IPCIS_DB
-			)
-		self.dns = MySQL(
-			host=DNS_HOST,
-			user=DNS_USER,
-			passwd=DNS_PASSWD,
-			port=DNS_PORT,
-			db=DNS_DB
-			)
+		# self.ipcis = MySQL(
+		# 	host=IPCIS_HOST,
+		# 	user=IPCIS_USER,
+		# 	passwd=IPCIS_PASSWD,
+		# 	db=IPCIS_DB
+		# 	)
+		# self.dns = MySQL(
+		# 	host=DNS_HOST,
+		# 	user=DNS_USER,
+		# 	passwd=DNS_PASSWD,
+		# 	port=DNS_PORT,
+		# 	db=DNS_DB
+		# 	)
 		self.initCppLib()
 
 	# 初始化C++动态库接口
