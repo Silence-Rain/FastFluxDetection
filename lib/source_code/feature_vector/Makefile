@@ -1,4 +1,4 @@
-target = ../libFeatureVector.so
+target = ../../libFeatureVector.so
 src = clusterUsingDomainInfo.cpp \
 	DGA_detection.cpp \
 	trieTree.cpp
@@ -10,4 +10,4 @@ $(target): $(src) $(dep)
 	g++ -o $(target) -shared -fPIC $(src)
 
 clean:
-	rm -rf *.o $(target)
+	rm -rf $(target)

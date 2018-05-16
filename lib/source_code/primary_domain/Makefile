@@ -1,5 +1,5 @@
 src = getDGADomianNamesResolvedIP.cpp
-target = ../libPrimaryDomain.so
+target = ../../libPrimaryDomain.so
 deps = getDGADomianNamesResolvedIP.h
 
 $(target): $(src) $(deps)
@@ -7,4 +7,4 @@ $(target): $(src) $(deps)
 	-I/usr/local/mysql/include/mysql -L/usr/local/mysql/lib -l mysqlclient
 
 clean:
-	rm -rf *.so
+	rm -rf $(target)

@@ -33,7 +33,6 @@ def getLevenshteinDistance(rfile):
 def jaccardIndex(arr, i, j):
 	setA = set()
 	setB = set()
-
 	for item in arr:
 		# setA中加入KMeans聚类簇编号为i的域名
 		if int(item[1]) == i:
@@ -41,7 +40,6 @@ def jaccardIndex(arr, i, j):
 		# setA中加入DBScan聚类簇编号为j的域名
 		if int(item[2]) == j:
 			setB.add(item[0])
-
 	# 并集不为空时才计算
 	# 保留小数点后6位
 	if len(setA | setB) != 0:
@@ -60,20 +58,15 @@ def main(fv, ld, wfile):
 	# 所有DBScan聚类簇（格式：[域名, DBScan聚类簇编号]）
 	ld_raw = pd.DataFrame(np.array(getLevenshteinDistance(ld)), 
 		columns=["domain", "ld"])
-
 	# 以域名为连接列，水平合并所有KMeans聚类簇和所有DBScan聚类簇，取交集
 	# 最终格式：[域名, KMeans聚类簇编号, DBScan聚类簇编号]
 	fv_ld = pd.merge(fv_raw, ld_raw, on="domain", how="inner")
 	fv_ld = np.array(fv_ld)
-
 	# 计算KMeans聚类簇和DBScan聚类簇的个数
 	size_fv = int(max(fv_raw["fv"], key=lambda x: int(x))) + 1
 	size_ld = int(max(ld_raw["ld"], key=lambda x: int(x))) + 2
-	print(size_fv, size_ld)
-	
 	# 初始化Jaccard Index矩阵
 	ji = [[0.0 for y in range(size_ld)] for x in range(size_fv)]
-
 	# 簇之间两两计算Jaccard Index
 	for i in range(size_fv):
 		for j in range(size_ld):
@@ -85,6 +78,6 @@ def main(fv, ld, wfile):
 
 
 if __name__ == '__main__':
-	main("data/feature_test_kmeans.dat", 
-		"data/levenshtein_dbscan.dat", 
-		"data/jaccard_index.dat")
+	main("../../data/feature_vector/feature_kmeans_malicious5000.dat", 
+		"../../data/levenshtein_distance/levenshtein_dbscan_malicious5000.dat", 
+		"../../data/jaccard_index_malicious5000.dat")

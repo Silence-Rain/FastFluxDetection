@@ -2,9 +2,21 @@
 
 import time
 
+# 转换dat文件为带label的域名数组
+def convert2list(benign, bot):
+	res = []
+	with open(benign, "r") as fbenign:
+		for line in fbenign.readlines()[:10]:
+			res.append([0, line.strip()])
+	with open(bot, "r") as fbot:
+		for line in fbot.readlines()[:10]:
+			res.append([1, line.strip()])
+
+	return res
+
 # 计算地理分布的香农熵
-def shannon_entropy():
-	pass
+def shannon_entropy(location):
+	return 0
 
 # 计算whois测度信息
 # 参数：原始whois信息

@@ -20,16 +20,16 @@ class DetailModel(object):
 			port=DNS_PORT,
 			db=DNS_DB
 			)
+		self.initCppLib()
 
 	# 初始化C++动态库接口
 	def initCppLib(self):
 		ll = cdll.LoadLibrary
-		lib = ll("lib/libPrimaryDomain.so")
+		lib = ll("../../lib/libPrimaryDomain.so")
 		init = lib.init
 		self.getPrimaryDomain = lib.getPrimaryDomain
 		self.getPrimaryDomain.argtypes = [c_char_p]
 		self.getPrimaryDomain.restype = c_char_p
-
 		init()
 
 	# 获取域名TTL
@@ -38,7 +38,7 @@ class DetailModel(object):
 	async def get_ttl(self, domain):
 		pd = self.getPrimaryDomain(domain.encode("utf-8")).decode()
 		sql = "SELECT ttl FROM domain_name WHERE primary_domain='%s';" % pd
-		rs = self.dns.get(sql)
+		rs = await self.dns.get(sql)
 
 		return int(rs[0])
 
@@ -48,7 +48,7 @@ class DetailModel(object):
 	async def get_whois(self, domain):
 		pd = self.getPrimaryDomain(domain.encode("utf-8")).decode()
 		sql = "SELECT * FROM domain_whois WHERE primary_domain='%s';" % pd
-		rs = self.dns.get(sql)
+		rs = await self.dns.get(sql)
 
 		return list(rs)
 
@@ -56,9 +56,14 @@ class DetailModel(object):
 	# 参数：全域名
 	# 返回值：[解析IP]
 	async def get_ip(self, domain):
-		sql = "SELECT ip FROM resolved_ip WHERE domain_name='%s" % domain
-		rs = self.dns.query(sql)
 		ret = []
+		pd = self.getPrimaryDomain(domain.encode("utf-8")).decode()
+		if pd == domain:
+			sql = ("SELECT ip FROM resolved_ip WHERE domain_id IN ("
+			"SELECT domain_id FROM domain_name WHERE primary_domain='%s');" % pd)
+		else:
+			sql = "SELECT ip FROM resolved_ip WHERE domain_name='%s" % domain
+		rs = await self.dns.query(sql)
 		for item in rs:
 			ret.append(int(item[0]))
 
@@ -71,7 +76,7 @@ class DetailModel(object):
 		ret = {}
 		for ip in ips:
 			sql = "SELECT longitude,latitude FROM IP2Location WHERE ipStart<%s AND ipEnd>%s;" % ip
-			rs = self.ipcis.get(sql)
+			rs = await self.ipcis.get(sql)
 			ret[ip] = rs
 
 		return ret

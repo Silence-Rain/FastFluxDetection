@@ -24,9 +24,8 @@ using  namespace std;
 #define LABEL_LEN            				64
 #define DOMAIN_LEN                          128
 #define DOMAIN_LENGTH                       32*sizeof(unsigned int)
-#define FILE_LOCATION                       "/home/xdzang/Fast_Flux_detection"
-#define LEGAL_LIST_FILE                     "lib/source_code/Legal_Domains_Suffixes"
-#define DNS_SUF_FILE         				"lib/source_code/Internet_Domains_Suffixes"
+#define LEGAL_LIST_FILE                     "../../lib/source_code/Legal_Domains_Suffixes"
+#define DNS_SUF_FILE         				"../../lib/source_code/Internet_Domains_Suffixes"
 
 typedef struct domain_info_
 {

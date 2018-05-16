@@ -36,9 +36,9 @@ class OS_ELM(object):
 		for row in data:
 			# 记录样本label
 			temp = []
-			label.append(int(row[1]))
+			label.append(int(row[0]))
 			# 获取特征数据
-			for item in row[2:]:
+			for item in row[1:]:
 				temp.append(item)
 			matrix.append(temp)
 		
@@ -54,6 +54,8 @@ class OS_ELM(object):
 		# 计算输出权重
 		self.beta = self.M * H0.T * T0
 
+		self.error_calc(data)
+
 		return self
 
 	# 使用在线数据更新网络
@@ -64,12 +66,12 @@ class OS_ELM(object):
 		for row in data:
 			Tn = np.zeros((1, 7))
 			# 处理样本标签
-			b = int(row[1])
+			b = int(row[0])
 			Tn[0][b - 1] = 1
 			Tn = Tn * 2 - 1
 			# 获取特征数据
 			matrix = []
-			for item in row[2:]:
+			for item in row[1:]:
 				matrix.append(item)
 			pn = np.mat(matrix)
 			# 更新隐层输出矩阵
@@ -84,21 +86,23 @@ class OS_ELM(object):
 
 	# 使用现有模型对数据分类
 	# 参数：需要分类的数据（np.array）
-	# 返回值：数据的label列
+	# 返回值：添加label列的数据
 	def predict(self, data):
-		ret = []
+		res = []
 		for row in data:
 			# 处理特征
 			matrix = []
-			for item in row[2:]:
+			for item in row[1:]:
 				matrix.append(item)
 			p = np.mat(matrix)
 			HTrain = self.sig(p, self.Iw, self.bias)
 			Y = HTrain * self.beta
 			# 返回预测label
-			ret.append(argmax(Y) + 1)
+			res.append(argmax(Y) + 1)
+		res = np.array(res)
+		ret = np.hstack((res.reshape(-1, 1), data))
 
-		return np.array(ret).reshape(-1, 1)
+		return ret
 
 	# 计算训练的误差值
 	# 参数：训练数据
@@ -108,19 +112,19 @@ class OS_ELM(object):
 		for row in data:
 			# 处理特征
 			matrix = []
-			for item in row[2:]:
+			for item in row[1:]:
 				matrix.append(item)
 			p = np.mat(matrix)
 			HTrain = self.sig(p, self.Iw, self.bias)
 			Y = HTrain * self.beta
 			# 若预测结果和实际结果相同则计数
-			if np.argmax(Y) + 1 == int(row[1]):
+			if np.argmax(Y) + 1 == int(row[0]):
 				correct += 1
 			sum += 1
 		print("训练准确性为：%f" % (correct / sum))
 
-if __name__ == '__main__':
-	raw = np.loadtxt(open("./segment_test.csv", "r"), delimiter=",", skiprows=1)
-	elm = OS_ELM(hidden_neuron=180, input_neuron=19)
-	network = elm.fit_init(data=raw)
-	network.fit_train(data=raw)
+# if __name__ == '__main__':
+# 	raw = np.loadtxt(open("./segment_test.csv", "r"), delimiter=",", skiprows=1)
+# 	elm = OS_ELM(hidden_neuron=180, input_neuron=19)
+# 	network = elm.fit_init(data=raw)
+# 	network.fit_train(data=raw)
