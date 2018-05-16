@@ -11,13 +11,6 @@
 #include <fcntl.h>
 #include <time.h>
 #include <iostream>
-#include <net/ethernet.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <arpa/nameser.h>
-#include <netdb.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -29,12 +22,9 @@
 #include <algorithm>
 #include "DGA_detection.h"
 #include "trieTree.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 using namespace std;
 
-#define  Dict_File_Normailized  "../../lib/feature_vector/source_code/English_Words_Dict_Normalized"
+#define  Dict_File_Normailized  "../../lib/source_code/feature_vector/English_Words_Dict_Normalized"
 
 typedef struct _nLdDomainLevel
 {
@@ -54,60 +44,29 @@ struct domain_IP_TTl_
     int traingFlag;
 }domain_IP_TTl;
 
-struct TimeSpec
-{
-	int year;
-	int month;
-	int mday;
-};
 class clusterUsingDomainInfo
 {
     public:
-        clusterUsingDomainInfo();
         ~clusterUsingDomainInfo();
-        void alexTopAMillionProcess(const char *rFilebuff,const char *wFilebuff);
-        void filterMaliciousDomains(const char *rFilebuff,const char *wFilebuff);
         map<int,vector<struct domain_IP_TTl_> > getDomainFromInfoTestFile(const char *rFilebuff,bool isTraining);
-        time_t MakeTime(string &str);
-        void normalizeDict(const char *rFilebuf, const char *wFilebuf);
-        void processorDomainFile(const char *rFilebuf,const char *ipblackfi,
-                            const char *wFilebuf,const char *blackdomainfile);
-        void outputDnsAbstractFile(const char *rFilebufAbstract,const char *wFilebufAbstract);
-        vector<string> getDomainSet();
         void initFun();
         nLdDomainLevel getDomainNLDs(string domainName);
         set<string> n_GramFeatureCalcu(string domainName,int n);
         double getEntroy(string domainName);
-        double calculateDistanceOfDomiansUsingNgrams(string dnameFir,string dnameSec);
         int lengthOfNLDs(string dnameNld);
         int lengthOfDomain(string domainName);
         double numericPercentageInDomain(string domainName);
         int tLDCountsInDomain(string domainName);
-        map<string,vector<string> > secondLDGrouping(const char*rFilebuff);
         void featureVectorCalculate(vector<struct domain_IP_TTl_>domains,Trie_node root,
                                     const char *wfilebuf,bool isTraing);
         vector<double> nGramAverageAnddeviationCalcu(set<string>ngrams,Trie_node root);
         double medianCalcu(vector<int>ngramSet);
         trieTree* getTrieTree();
-        u_long ip2long(const char *ip);
         struct domain_IP_TTl_ parsingDomainIPString(string line,bool isTraining);
         void featureVectorCalcu(map<int,vector<struct domain_IP_TTl_> >domainIpPara,Trie_node root,
                                 const char *wfilebuf,bool isTraing);
-        set<string> readIPBlacklist(const char *rfilebuff);
-        void readFirstTenThoundsand(const char *readFile,const char *writeFile);
-        void trainDataProcssOfZWW(const char *readFile,const char *writeFile,bool isbengin);
-        void getZWWDomain(const char *readFile,const char *domainfile,
-                                          const char *writeFile,const char *writeFile2);
-
-        void getlostDoamin(const char *readFile,const char *rFilewhois,
-                           const char *rbadFile,const char *wlostwrite);
-        void domain3ldbigthanfive(map<string,vector<string> > paraGrouping,const char* wfilebuf);
         friend set<string> operator+(const set<string> &a, const set<string>& b);//集合并运算
         friend set<string> operator*(const set<string> &a, const set<string>& b);//集合交运算
-        void getResolvedIPSimilarityMatrix(const char *domain_ipfile,const char *similarmatrxifile);
-        void getThreeLevelDoamin(const char *Alexfile,const char *AlexfileZWW,const char *wfile);
-        //以下为对比试验部分
-        void getMeaningfulCharactersRatio(const char* rfilebuf,const char* wfilebuf,Trie_node root);
         void ngramCalcu(const char* rfilebuf,const char* wfilebuf,Trie_node root,bool isbenign);
         double ngramValue(set<string>ngrams,Trie_node root);
     private:
