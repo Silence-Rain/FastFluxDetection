@@ -34,7 +34,7 @@
 #include <arpa/inet.h>
 using namespace std;
 
-#define  Dict_File_Normailized  "../../lib/source_code/English_Words_Dict_Normalized"
+#define  Dict_File_Normailized  "../../lib/feature_vector/source_code/English_Words_Dict_Normalized"
 
 typedef struct _nLdDomainLevel
 {

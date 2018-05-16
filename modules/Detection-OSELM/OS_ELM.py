@@ -33,6 +33,7 @@ class OS_ELM(object):
 	def get_label_range(self, label):
 		bot = min(label)
 		top = max(label)
+		print(top - bot + 1, bot)
 
 		return top - bot + 1, bot
 
@@ -110,7 +111,7 @@ class OS_ELM(object):
 			HTrain = self.sig(p, self.Iw, self.bias)
 			Y = HTrain * self.beta
 			# 返回预测label
-			res.append(argmax(Y) + 1)
+			res.append(argmax(Y) + self.ran[1])
 
 		return res
 
@@ -129,15 +130,15 @@ class OS_ELM(object):
 			HTrain = self.sig(p, self.Iw, self.bias)
 			Y = HTrain * self.beta
 			# 若预测结果和实际结果相同则计数
-			# print(np.argmax(Y) + 1, int(row[label_index]))
-			if np.argmax(Y) + 1 == int(row[label_index]):
+			# print(np.argmax(Y) + self.ran[1], int(row[label_index]))
+			if np.argmax(Y) + self.ran[1] == int(row[label_index]):
 				correct += 1
 			sum += 1
 		print("训练准确性为：%f" % (correct / sum))
 
 if __name__ == '__main__':
-	raw = np.loadtxt(open("/Users/Silence/Downloads/OS-ELM/segment_test.csv", "r"), 
+	raw = np.loadtxt(open("/Users/Silence/Downloads/OS-ELM/segment_test1.csv", "r"), 
 		delimiter=",", skiprows=1)
-	elm = OS_ELM(hidden_neuron=180, input_neuron=19)
+	elm = OS_ELM(hidden_neuron=60, input_neuron=5)
 	network = elm.fit_init(data=raw)
 	network.fit_train(data=raw)
