@@ -20,19 +20,19 @@ class MySQL(object):
 		self.cursor = self.conn.cursor()
 
 	# 查询一条记录
-	async def get(self, sql):
-		await self.cursor.execute(sql)
+	def get(self, sql):
+		self.cursor.execute(sql)
 		return self.cursor.fetchone()
 
 	# 查询所有记录
-	async def query(self, sql):
-		await self.cursor.execute(sql)
+	def query(self, sql):
+		self.cursor.execute(sql)
 		return self.cursor.fetchall()
 
 	# 无返回值的执行语句
-	async def execute(self, sql):
+	def execute(self, sql):
 		try:
-			await self.cursor.execute(sql)
+			self.cursor.execute(sql)
 			self.conn.commit()
 		except Exception as e:
 			self.conn.rollback()
