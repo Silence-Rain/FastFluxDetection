@@ -37,8 +37,7 @@ def formatter(benign, bot, labeled, res):
 			ret.append([item[0], item[1], ttl, whois_info["is_expire"], 
 				whois_info["item_complete"], ip_entropy])
 		except:
-			continue
-			# ret.append([item[0], item[1]])
+			ret.append([item[0], item[1]])
 
 	with open(res, "w") as f:
 		for item in ret:
@@ -65,13 +64,9 @@ def brute(labeled, res):
 			whois = model.get_whois(item[1])
 			ip = model.get_ip(item[1])
 			ip_location = model.get_ip_location(ip)
-			
-			# whois_info = whois_analysis(whois)
-			# ip_entropy = shannon_entropy(ip_location)
 
 			ret.append([item, ttl, whois, ip_location])
 		except:
-			# continue
 			ret.append([item[0], item[1]])
 
 	with open(res, "w") as f:
