@@ -34,13 +34,18 @@ class DetailModel(object):
 
 	# 获取域名TTL
 	# 参数：全域名
-	# 返回值：TTL值（第一条记录）
+	# 返回值：[TTL值]
 	def get_ttl(self, domain):
+		ret = []
 		pd = self.getPrimaryDomain(domain.encode("utf-8")).decode()
 		sql = "SELECT ttl FROM domain_name WHERE primary_domain='%s';" % pd
-		rs = self.dns.get(sql)
+		rs = self.dns.query(sql)
 
-		return int(rs[0])
+		if len(rs) != 0:
+			for item in rs:
+				ret.append(int(item[0]))
+
+		return ret
 
 	# 获取域名whois信息
 	# 参数：全域名
@@ -50,7 +55,10 @@ class DetailModel(object):
 		sql = "SELECT * FROM domain_whois WHERE primary_domain='%s';" % pd
 		rs = self.dns.get(sql)
 
-		return list(rs)
+		if rs != None:
+			return list(rs)
+		else:
+			return []
 
 	# 获取域名解析IP
 	# 参数：全域名
@@ -62,20 +70,22 @@ class DetailModel(object):
 			sql = ("SELECT a.ip FROM resolved_ip as a INNER JOIN domain_name as b "
 			"ON a.domain_id=b.domain_id WHERE b.primary_domain='%s';" % pd)
 		else:
-			sql = "SELECT ip FROM resolved_ip WHERE domain_name='%s" % domain
+			sql = "SELECT ip FROM resolved_ip WHERE domain_name='%s';" % domain
 		rs = self.dns.query(sql)
-		for item in rs:
-			ret.append(int(item[0]))
+
+		if len(rs) != 0:
+			for item in rs:
+				ret.append(int(item[0]))
 
 		return ret
 
 	# 获取域名解析IP地理位置
-	# 参数：[解析IP（前1k个）]
-	# 返回值：{ip:(lng, lat)...}
+	# 参数：[解析IP（前100个）]
+	# 返回值：{ip:(国家,地区,城市)...}
 	def get_ip_location(self, ips):
 		ret = {}
-		for ip in ips[:1000]:
-			sql = "SELECT longitude,latitude FROM IP2Location WHERE ipStart<%s AND ipEnd>%s;" % (ip, ip)
+		for ip in ips[:100]:
+			sql = "SELECT country,region,city FROM IP2Location WHERE ipStart<%s AND ipEnd>%s;" % (ip, ip)
 			rs = self.ipcis.get(sql)
 			ret[ip] = rs
 

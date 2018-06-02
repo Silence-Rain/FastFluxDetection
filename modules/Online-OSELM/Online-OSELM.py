@@ -3,6 +3,7 @@
 import sys
 sys.path.append("../../")
 import numpy as np
+import random
 from OS_ELM import OS_ELM
 
 # 从文件中读取域名特征向量
@@ -22,8 +23,12 @@ def write_data(data, path):
 
 
 if __name__ == '__main__':
-	elm = OS_ELM(hidden_neuron=50, input_neuron=4)
-	res = read_data("../../data/train_set/vector.dat")
+	elm = OS_ELM(hidden_neuron=60, input_neuron=5)
+	res = np.loadtxt(open("../../data/segment_test1.csv", "r"), 
+		delimiter=",", skiprows=1)
+	# res = read_data("../../data/train_set/vector.dat")
+	# res = random.shuffle(res)
+	network = elm.fit_init(data=res[:600])
+	network.fit_train(data=res[600:])
 
-	network = elm.fit_init(data=res)
-	network.fit_train(data=res)
+	# network.predict()
