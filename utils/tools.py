@@ -4,9 +4,12 @@ import time
 import math
 import requests
 import IPy
+import numpy as np
 
 # 计算地理分布的香农熵
 # 根据ip所属的国家和地区，计算分布概率
+# 参数：{ip: (国家,地区,城市)}
+# 返回值：香农熵（保留6位小数）
 def shannon_entropy(geos):
 	# 从地理归属字段中截取国家，地区部分
 	raw = ["%s-%s" % (x[0],x[1]) for x in geos.values()]
@@ -47,11 +50,15 @@ def whois_analysis(info):
 
 	return ret
 
-# 计算对端IP到解析IP的地理距离
-def opposite_location(ips):
+# 计算对端IP到解析IP的地理距离平均值
+# # 参数：{ip: (国家,地区,城市)}
+# 返回值：对端IP到解析IP的地理距离平均值（保留6位小数）
+def opposite_location(ip_dict):
 	proxy = {"http": "http://yunyang:yangyun123@202.112.23.167:8080"}
 	cur_date = time.strftime("%Y-%m-%d", time.localtime())
 	ret = {}
+	# 取出解析IP列表
+	ips = list(ip_dict.keys())
 	# 遍历所有解析IP
 	for ip in ips:
 		opposite_dist = []
@@ -67,9 +74,9 @@ def opposite_location(ips):
 			# 获得对端IP经纬度，并计算距离
 			for item in i[1:]:
 				opposite_dist.append(haversine(target_pos, item.split(" ")[-2:]))
-				# opposite_dist.append(item.split("$")[-2])
-		ret[ip] = opposite_dist
-	return ret
+		# 记录每个对端IP的平均距离
+		ret[ip] = round(sum(opposite_dist)/len(opposite_dist), 6)
+	return round(sum(ret.values())/len(ret), 6)
 
 # 计算地球上两个经纬度坐标点之间大圆距离
 # 使用haversine公式
@@ -86,6 +93,27 @@ def haversine(pos1, pos2):
 
 	return round(c * r, 4)
 
-if __name__ == '__main__':
-	print(opposite_location([3544301847,3544302017]))
+# 0-1归一化
+def zeroone(x, min, max):
+	if x < min:
+		return 0
+	if x > max:
+		return 1
+	return (x - min) / (max - min)
 
+# 使用0-1归一化，处理除label以外所有列的数据
+# 参数：待处理数据，label列下标
+# 返回值：0-1归一化之后的数据
+def normalize(data, label_index=-1):
+	data_size = len(data[0])
+	data_max = [0 for x in range(data_size)]
+	data_min = [0 for x in range(data_size)]
+
+	for ind in range(0, data_size):
+		if ind != label_index:
+			data_max[ind] = np.max(data[:,ind:ind+1])
+			data_min[ind] = np.min(data[:,ind:ind+1])
+			for i in range(len(data)):
+				data[i][ind] = zeroone(data[i][ind], data_min[ind], data_max[ind])
+
+	return data

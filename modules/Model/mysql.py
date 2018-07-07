@@ -17,7 +17,7 @@ class MySQL(object):
 		self.port = port
 		self.charset = charset
 		self.connect()
-		# self.refresh()
+		self.refresh()
 
 	def get(self, sql):
 		self.cursor.execute(sql)
