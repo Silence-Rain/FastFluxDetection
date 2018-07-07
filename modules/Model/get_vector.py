@@ -3,10 +3,10 @@
 import time
 import sys
 sys.path.append("../../")
-# from model import DetailModel
+from model import DetailModel
 from utils.tools import *
 
-# model = DetailModel()
+model = DetailModel()
 
 # 从benign，bot获取原始域名数据，添加label后写入labeled
 # 每行格式：[0/1, 域名]

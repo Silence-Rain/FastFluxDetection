@@ -93,7 +93,7 @@ def KMeansOfFeatureVector(rfile, wfile, mode=1):
 if __name__ == '__main__':
 	initCppLibs()
 	get_feature_vector("../../data/train_set/bots_domain.dat".encode("utf-8"), 
-		"../../data/feature_vector/1.dat".encode("utf-8"))
-	# dereplicate("../../data/feature_vector/feature_test.dat")
-	# KMeansOfFeatureVector("../../data/feature_vector/feature_test.dat", 
-	# 	"../../data/feature_vector/feature_test_kmeans.dat")
+		"../../data/feature_vector/feature_test.dat".encode("utf-8"))
+	dereplicate("../../data/feature_vector/feature_test.dat")
+	KMeansOfFeatureVector("../../data/feature_vector/feature_test.dat", 
+		"../../data/feature_vector/feature_test_kmeans.dat")
