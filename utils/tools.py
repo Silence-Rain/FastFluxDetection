@@ -51,32 +51,39 @@ def whois_analysis(info):
 	return ret
 
 # 计算对端IP到解析IP的地理距离平均值
-# # 参数：{ip: (国家,地区,城市)}
+# 返回值：{self:(经度,纬度), opposite:[(经度,纬度),...]}
 # 返回值：对端IP到解析IP的地理距离平均值（保留6位小数）
 def opposite_location(ip_dict):
-	proxy = {"http": "http://yunyang:yangyun123@202.112.23.167:8080"}
-	cur_date = time.strftime("%Y-%m-%d", time.localtime())
-	ret = {}
-	# 取出解析IP列表
-	ips = list(ip_dict.keys())
-	# 遍历所有解析IP
-	for ip in ips:
-		opposite_dist = []
-		target_pos = []
-		ip_str = str(IPy.IP(ip))
-		# 查询当天的IP活动流记录
-		r = requests.get("http://211.65.197.210:8080/IPCIS/activityDatabase/"
-			"?IpSets=%s:32&TableName=%s&Mode=1" % (ip_str, cur_date), proxies=proxy)
-		res = r.json()[ip_str+":32"]
-		for i in res:
-			# 获得解析IP经纬度
-			target_pos = i[0].split(" ")[-2:] if len(i) != 0 else target_pos
-			# 获得对端IP经纬度，并计算距离
-			for item in i[1:]:
-				opposite_dist.append(haversine(target_pos, item.split(" ")[-2:]))
-		# 记录每个对端IP的平均距离
-		ret[ip] = round(sum(opposite_dist)/len(opposite_dist), 6)
+	opposite_dist = []
+	for item in ip_dict["opposite"]:
+		opposite_dist.append(haversine(ip_dict["self"], item))
+	# 记录每个对端IP的平均距离
+	ret[ip] = round(sum(opposite_dist)/len(opposite_dist), 6)
 	return round(sum(ret.values())/len(ret), 6)
+
+	# proxy = {"http": "http://yunyang:yangyun123@202.112.23.167:8080"}
+	# cur_date = time.strftime("%Y-%m-%d", time.localtime())
+	# ret = {}
+	# # 取出解析IP列表
+	# ips = list(ip_dict.keys())
+	# # 遍历所有解析IP
+	# for ip in ips:
+	# 	opposite_dist = []
+	# 	target_pos = []
+	# 	ip_str = str(IPy.IP(ip))
+	# 	# 查询当天的IP活动流记录
+	# 	r = requests.get("http://211.65.197.210:8080/IPCIS/activityDatabase/"
+	# 		"?IpSets=%s:32&TableName=%s&Mode=1" % (ip_str, cur_date), proxies=proxy)
+	# 	res = r.json()[ip_str+":32"]
+	# 	for i in res:
+	# 		# 获得解析IP经纬度
+	# 		target_pos = i[0].split(" ")[-2:] if len(i) != 0 else target_pos
+	# 		# 获得对端IP经纬度，并计算距离
+	# 		for item in i[1:]:
+	# 			opposite_dist.append(haversine(target_pos, item.split(" ")[-2:]))
+	# 	# 记录每个对端IP的平均距离
+	# 	ret[ip] = round(sum(opposite_dist)/len(opposite_dist), 6)
+	# return round(sum(ret.values())/len(ret), 6)
 
 # 计算地球上两个经纬度坐标点之间大圆距离
 # 使用haversine公式

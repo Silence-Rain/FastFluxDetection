@@ -172,11 +172,11 @@ def dbscanOfLevenshteinDist(rfile, wfile, mode=1):
 
 if __name__ == '__main__':
 	initCppLibs()
-	clusterDomains("../../data/example/ld_example.dat", 
-		"../../data/example/ld_cluster_example.dat", 3600)
-	get2dl3dl("../../data/train_set/malicious_10000.dat", 
-	 	"../../data/levenshtein_distance/2dl3dl_malicious5000.dat")
-	getLevenshteinDistOf2dl3dl("../../data/levenshtein_distance/2dl3dl_malicious5000.dat", 
-		"../../data/levenshtein_distance/levenshtein_malicious5000.dat")
-	dbscanOfLevenshteinDist("../../data/levenshtein_distance/levenshtein_malicious5000.dat", 
-		"../../data/levenshtein_distance/levenshtein_dbscan_malicious5000.dat", 0)
+	# clusterDomains("../../data/example/ld_example.dat", 
+	# 	"../../data/example/ld_cluster_example.dat", 3600)
+	get2dl3dl("../../data/train_set/domainData_test1.dat", 
+	 	"../../data/levenshtein_distance/2dl3dl_test1.dat")
+	getLevenshteinDistOf2dl3dl("../../data/levenshtein_distance/2dl3dl_test1.dat", 
+		"../../data/levenshtein_distance/levenshtein_test1.dat")
+	dbscanOfLevenshteinDist("../../data/levenshtein_distance/levenshtein_test1.dat", 
+		"../../data/levenshtein_distance/levenshtein_dbscan_test1.dat", 0)
