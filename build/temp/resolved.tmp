@@ -1,0 +1,11 @@
+{
+"108.59.2.24": {"country":"美国", "region":"VIRGINIA", "city":"MANASSAS", "longitude":"西经 77.54", "latitude":"北纬 38.8"},
+"119.28.206.193": {"country":"中国", "region":"BEIJING", "city":"BEIJING", "longitude":"东经 116.39", "latitude":"北纬 39.93"},
+"123.128.14.122": {"country":"中国", "region":"山东", "city":"泰安", "longitude":"东经 117.09", "latitude":"北纬 36.2"},
+"123.128.14.123": {"country":"中国", "region":"山东", "city":"泰安", "longitude":"东经 117.09", "latitude":"北纬 36.2"},
+"173.255.246.13": {"country":"美国", "region":"CALIFORNIA", "city":"FREMONT", "longitude":"西经 121.98", "latitude":"北纬 37.57"},
+"222.20.147.174": {"country":"中国", "region":"湖北", "city":"武汉", "longitude":"东经 114.3118", "latitude":"北纬 30.5984"},
+"222.28.152.201": {"country":"中国", "region":"中国", "city":"", "longitude":"东经 0", "latitude":"北纬 0"},
+"46.227.200.24": {"country":"英国", "region":"ENGLAND", "city":"MANCHESTER", "longitude":"西经 2.24", "latitude":"北纬 53.48"},
+"60.213.22.254": {"country":"中国", "region":"山东", "city":"临沂", "longitude":"东经 118.36", "latitude":"北纬 35.11"},
+}
