@@ -1,7 +1,8 @@
 import io
+import sys
 import re
 import IPy
-import tools
+import elm.tools
 
 def read_dict(path):
 	with io.open(path, "r", encoding="utf8") as f:
@@ -82,10 +83,13 @@ def write_file(path, vectors):
 
 
 if __name__ == '__main__':
-	raw = read_file("./temp/alexa.dat")
+	# 命令行参数：数据集标签
+	label = sys.argv[1]
+
+	raw = read_file("./temp/%s.dat" % label)
 	ns_dict = read_dict("./temp/ns.dict")
 	resolved_dict = read_dict("./temp/resolved.dict")
 	res = merge(raw, ns_dict, resolved_dict)
 	vs = gen_vector(res)
-	write_file("./temp/alexa.vec", vs)
+	write_file("./temp/%s.vec" % label, vs)
 

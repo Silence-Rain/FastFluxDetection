@@ -48,7 +48,6 @@ struct TimeSpec
     int hour;
     int min;
     int sec;
-
 };
 
 //文件预处理
@@ -558,42 +557,23 @@ void writeIPLocation(const char* path, vector<string> iplist, vector<IPaddressin
     outFile<<"}"<<endl;
 }
 
-int main()
+int main(int argc, char** argv)
 {
-    char  search_str[128];
-    char  buf[256];
-    FILE  *fp_stream = NULL;
+    char* label = argv[1];
+    char originalFile[64];
+    char tempFile[64];
+    char dataFile[64];
+    snprintf(originalFile, sizeof(originalFile), "./data/dga_to_fast-flux_%s", label);
+    snprintf(tempFile, sizeof(tempFile), "./temp/%s_after.tmp", label);
+    snprintf(dataFile, sizeof(dataFile), "./temp/%s.dat", label);
+
     vector<string> nameServerIPlist, resolvedIPlist;
     vector<IPaddressinfo> nsIPLocation, resolvedIPLocation;
 
-    // //循环处理DGA文件
-    // while(1)
-    // {
-    //     bzero(search_str, sizeof(search_str));
-    //     snprintf(search_str, sizeof(search_str), "find %s/ -type f -a -not -cmin -1| sort -n|head -n 20|grep dga_to_fast-flux", DNS_DGA_LOCATION);
-    //     if((fp_stream = popen(search_str, "r")) == NULL)
-    //     {
-    //         pclose(fp_stream);
-    //         cout<<"execute command line "<<search_str<<" error!"<<endl;
-    //         return 1;
-    //     }
-    //     if(fgets(buf, sizeof(buf), fp_stream)==NULL)
-    //     {
-    //         //没有DGA源数据文件,等待15秒再查找新DGA源数据文件
-    //         pclose(fp_stream);
-    //         sleep(15);
-    //     }
-    //     else
-    //     {
-    //         //处理文件
-    //         sleep(2);//休息2秒 继续处理
-    //     }
-    // }
-
-    fileprocessing("./data/alexa_raw","./temp/alexa_after.tmp");
-    getwhoisfromfile("./temp/alexa_after.tmp","./temp/alexa.dat");
-    resolvedIPlist = getManagementInfo("./temp/alexa.dat");
-    nameServerIPlist = getLocationInfo("./temp/alexa.dat");
+    fileprocessing(originalFile, tempFile);
+    getwhoisfromfile(tempFile, dataFile);
+    resolvedIPlist = getManagementInfo(dataFile);
+    nameServerIPlist = getLocationInfo(dataFile);
     resolvedIPLocation = getIPinformationfromIPCIS(resolvedIPlist);
     nsIPLocation = getIPinformationfromIPCIS(nameServerIPlist);
     writeIPLocation("./temp/resolved.dict", resolvedIPlist, resolvedIPLocation);
