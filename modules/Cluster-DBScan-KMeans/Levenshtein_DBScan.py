@@ -26,36 +26,26 @@ def initCppLibs():
 
 	print("动态库libPrimaryDomain.so已加载！")
 
-
-# 从rfile中读取在window时间窗口内的记录，每行格式：domainName,ip,ttl,firstTime
-# 聚合相同域名的不同ip，将ttl和firsttime取最小值
-# 结果写入到wfile中，每行格式：[domainName, [ip1, ip2, ...], ttl, firstTime]
-def clusterDomains(rfile, wfile, window):
-	ret = [[""]]    			# 最终写入结果
-	curTime = int(time.time())
-	with open(rfile, "r") as f:
-		res = f.readlines()
-		lastptr = 0     # 上一条记录的指针
-		# 按行读取
-		for i in range(0, len(res)):
-			arr = res[i].split(",")
-			# 若当前记录的发现时间在window时间窗口内，记录下来
-			if int(arr[-1]) >= curTime - window:
-				temp = [arr[0], [int(arr[1])], int(arr[2]), int(arr[3])]     # 写入数据结构
-				last = ret[lastptr]     # 上一条记录
-				# 若当前记录的域名与上一条相同，则聚合
-				if temp[0] == last[0]:
-					last[1].append(temp[1][0])
-					last[2] = temp[2] if (temp[2] < last[2]) else last[2]
-					last[3] = temp[3] if (temp[3] < last[3]) else last[3]
-				else:
-					ret.append(temp)
-					lastptr += 1
-
-	ret = ret[1:]
-	with open(wfile, "w") as f:
-		for item in ret:
-			f.write(str(item) + "\n")
+# 根据时间窗口取得测试集聚合IP后的结果
+# 每行格式：[域名，[ip1, ip2, ...]，TTL，timestamp]
+def cluster_by_window(test, test_res, window):
+	cur_time = 1505115200# int(time.time())
+	res = []
+	with open(test, "r") as f:
+		domains = []
+		for line in f.readlines():
+			temp = line.split(",")
+			if cur_time > int(temp[3]) + window:
+				continue
+			if temp[0] not in domains:
+				domains.append(temp[0])
+				res.append([temp[0], [int(temp[1])], int(temp[2]), int(temp[3])])
+			else:
+				idx = domains.index(temp[0])
+				res[idx][1].append(int(temp[1]))
+	with open(test_res, "w") as fres:
+		for item in res:
+			fres.write(str(item) + "\n")
 
 	print("域名的解析IP聚合 完成！")
 
@@ -172,11 +162,11 @@ def dbscanOfLevenshteinDist(rfile, wfile, mode=1):
 
 if __name__ == '__main__':
 	initCppLibs()
-	# clusterDomains("../../data/example/ld_example.dat", 
-	# 	"../../data/example/ld_cluster_example.dat", 3600)
-	get2dl3dl("../../data/train_set/domainData_test1.dat", 
-	 	"../../data/levenshtein_distance/2dl3dl_test1.dat")
-	getLevenshteinDistOf2dl3dl("../../data/levenshtein_distance/2dl3dl_test1.dat", 
-		"../../data/levenshtein_distance/levenshtein_test1.dat")
-	dbscanOfLevenshteinDist("../../data/levenshtein_distance/levenshtein_test1.dat", 
-		"../../data/levenshtein_distance/levenshtein_dbscan_test1.dat", 0)
+	cluster_by_window("../../data/train_set/domainData.dat", 
+		"../../data/train_set/domainData_test.dat", 10)
+	get2dl3dl("../../data/train_set/domainData_test.dat", 
+	 	"../../data/levenshtein_distance/2dl3dl_test.dat")
+	getLevenshteinDistOf2dl3dl("../../data/levenshtein_distance/2dl3dl_test.dat", 
+		"../../data/levenshtein_distance/levenshtein_test.dat")
+	dbscanOfLevenshteinDist("../../data/levenshtein_distance/levenshtein_test.dat", 
+		"../../data/levenshtein_distance/levenshtein_dbscan_test.dat", 0)

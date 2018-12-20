@@ -1,12 +1,13 @@
 #!coding=utf-8
 
 import time
+import os
 import sys
 sys.path.append("../../")
 from model import DetailModel
 from utils.tools import *
 
-model = DetailModel()
+#model = DetailModel()
 
 # 获取训练集
 # 从benign，bot获取原始域名数据，添加label后写入labeled
@@ -54,16 +55,17 @@ def get_raw_measure(path, temp):
 		for line in f.readlines():
 			raw.append(eval(line))
 
-	for index, item in enumerate(raw):
+	for index, item in enumerate(raw[:10]):
 		print("查询%d...%s" % (index, time.strftime('%Y-%m-%d %H:%M:%S')))
 		try:
 			ttl = item[2]
-			whois = model.get_whois(item[0])
+			whois = []#model.get_whois(item[0])
 			ip = item[1]
 			ip_location = model.get_ip_location(ip)
+			ip_lnglat = model.get_ip_lnglat(ip)
 
-			ret.append([item[0], ttl, whois, ip_location])
-		except:
+			ret.append([item[0], ttl, whois, ip_location, ip_lnglat])
+		except Exception as e:
 			ret.append([item[0]])
 
 	with open(temp, "w") as f:
@@ -85,10 +87,11 @@ def vectorize(temp, res):
 			# 计算解析IP地理分布熵
 			ip_entropy = shannon_entropy(item[3])
 			# 计算对端IP到解析IP的地理距离平均值
-			opposite_dist_avr = opposite_location(item[3])
-			ret.append([item[0][0], item[1], whois_info["is_expire"], whois_info["item_complete"], 
+			opposite_dist_avr = opposite_location(item[4])
+			ret.append([item[0], item[1], whois_info["is_expire"], whois_info["item_complete"], 
 				ip_entropy, opposite_dist_avr])
-		except:
+		except Exception as e:
+			print(e)
 			# 如果原数据格式异常，则直接跳过
 			continue
 
@@ -98,20 +101,31 @@ def vectorize(temp, res):
 
 
 if __name__ == '__main__':
-	# test: 测试，train:训练
+	# test: 生成测试数据集，train: 生成训练数据集
+	# 自动生成训练集的部分还在调试，但是可以用已有的训练集先运行
 	flag = "test"
+	# 训练集正常域名路径
+	benignPath = "../../data/raw_data/alexa_top10000.dat"
+	# 训练集botnet域名路径
+	botPath = "../../data/raw_data/bots_domain.dat"
+	# 训练集路径
+	labeledPath = "../../data/train_set/labeled_domain.dat"
+	# 测试集原始数据路径
+	testPath = "../../data/raw_data/domainData.dat"
+	# 测试集路径
+	testResPath = "../../data/raw_data/domainData_test.dat"
+	# 特征向量原始数据路径（临时）
+	tempPath = "../../data/train_set/temp_vector1.dat"
+	# 特征向量路径
+	resPath = "../../data/train_set/vector1.dat"
 
 	if flag == "train":
-		benignPath = "../../data/train_set/alexa_top10000.dat"
-		botPath = "../../data/train_set/bots_domain.dat"
-		labeledPath = "../../data/train_set/labeled_domain.dat"
 		get_train_set_by_label(benignPath, botPath, labeledPath)
+	elif flag == "test":
+		get_test_set_by_window(testPath, testResPath, 5)
 	else:
-		testPath = "../../data/train_set/domainData_Test.dat"
-		testResPath = "../../data/train_set/domainData_test_res.dat"
-		get_test_set_by_window("", "test", 5)
-	
-	tempPath = "../../data/train_set/temp_vector.dat"
-	resPath = "../../data/train_set/vector.dat"
-	get_raw_data(labeledPath, tempPath)
+		exit("指令错误，请选择正确的flag")
+
+	get_raw_measure(testResPath, tempPath)
 	vectorize(tempPath, resPath)
+	os.system("rm -f %s" % tempPath)

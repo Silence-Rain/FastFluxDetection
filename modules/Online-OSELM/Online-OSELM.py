@@ -8,11 +8,13 @@ from OS_ELM import OS_ELM
 from utils.tools import *
 
 # 从文件中读取域名特征向量
-def read_data(path):
+# ignore: 忽略前n列
+def read_data(path, ignore=0):
 	res = []
 	with open(path, "r") as f:
 		for line in f.readlines():
-			res.append(eval(line))
+			temp = eval(line)[ignore:]
+			res.append([float(i) for i in temp])
 
 	return np.array(res)
 
@@ -24,13 +26,29 @@ def write_data(data, path):
 
 
 if __name__ == '__main__':
+	# 训练数据集路径
+	trainPath = "../../data/train_set/train_vector.dat"
+	# 测试数据集路径
+	predictPath = "../../data/train_set/vector.dat"
+	# 隐层节点数
+	hidden_neuron_num = 60
+	# 输入层节点数
+	input_neuron_num = 4
+
+	# 读取数据集
+	# 暂时使用[:,:-1]切掉最后一列的解析IP平均距离，训练数据有待完善
+	train = read_data(trainPath)[:,:-1]
+	predict = read_data(predictPath, 1)[:,:-1]
 	# 建立OS-ELM，输入节点5个，隐层节点60个
-	elm = OS_ELM(hidden_neuron=60, input_neuron=5)
-	res = read_data("../../data/train_set/vector.dat")
+	elm = OS_ELM(hidden_neuron=hidden_neuron_num, input_neuron=input_neuron_num)
 	# 0-1归一化处理
-	res = normalize(res)
-	# 打乱顺序
-	np.random.shuffle(res)
-	# 后1000个用来预测，前面的用来训练
-	network = elm.fit_init(data=res[:-1000])
-	network.predict(data=res[-1000:, 1:])
+	train = normalize(train, 0)
+	predict = normalize(predict)
+	# # 打乱顺序
+	# np.random.shuffle(train)
+
+	# 训练模型
+	network = elm.fit_init(data=train)
+	# 预测结果并输出
+	res = network.predict(data=predict)
+	print(res)

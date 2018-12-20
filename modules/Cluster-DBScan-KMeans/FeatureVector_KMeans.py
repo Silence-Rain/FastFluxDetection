@@ -4,6 +4,7 @@ import sys
 sys.path.append("../../")
 from ctypes import *
 import io
+import os
 import numpy as np
 from sklearn.cluster import KMeans
 from utils import plot
@@ -24,25 +25,28 @@ def initCppLibs():
 
 	print("动态库libFeatureVector.so已加载！")
 
-# 获取rfile中C++接口所得域名特征向量结果
-# 去除其中重复项，写回
-def dereplicate(rfile):
-	ret = []			# 最终结果
-	ret_label = []		# 域名集合
-	with io.open(rfile, "r") as f:
+# 根据时间窗口取得测试集聚合IP后的结果
+# 每行格式：[域名，[ip1, ip2, ...]，TTL，timestamp]
+def cluster_by_window(test, test_res, window):
+	cur_time = 1505115200# int(time.time())
+	res = []
+	with open(test, "r") as f:
+		domains = []
 		for line in f.readlines():
-			label = line.split(",")[0]
+			temp = line.split(",")
+			if cur_time > int(temp[3]) + window:
+				continue
+			if temp[0] not in domains:
+				domains.append(temp[0])
+				res.append([temp[0], [int(temp[1])], int(temp[2]), int(temp[3])])
+			else:
+				idx = domains.index(temp[0])
+				res[idx][1].append(int(temp[1]))
+	with open(test_res, "w") as fres:
+		for item in res:
+			fres.write(str(item) + "\n")
 
-			# 当前域名不在已有集合中，特征向量加入最终结果
-			if label not in ret_label:
-				ret_label.append(label)
-				ret.append(line)
-
-	with io.open(rfile, "w") as f:
-		for line in ret:
-			f.write(line)
-
-	print("特征向量去重 完成！")
+	print("域名的解析IP聚合 完成！")
 
 # 根据mode取值确定聚类对象。0:二级域标签，1:三级域标签
 # 获取rfile中域名的特征向量
@@ -92,8 +96,10 @@ def KMeansOfFeatureVector(rfile, wfile, mode=1):
 
 if __name__ == '__main__':
 	initCppLibs()
-	get_feature_vector("../../data/train_set/domainData_test1.dat".encode("utf-8"), 
-		"../../data/feature_vector/feature_test1.dat".encode("utf-8"))
-	dereplicate("../../data/feature_vector/feature_test1.dat")
-	# KMeansOfFeatureVector("../../data/feature_vector/feature_test.dat", 
-	# 	"../../data/feature_vector/feature_test_kmeans.dat")
+	cluster_by_window("../../data/train_set/domainData.dat", 
+		"../../data/train_set/domainData_test.dat", 10)
+	get_feature_vector("../../data/train_set/domainData_test.dat".encode("utf-8"), 
+		"../../data/feature_vector/feature_test.dat".encode("utf-8"))
+	KMeansOfFeatureVector("../../data/feature_vector/feature_test.dat", 
+		"../../data/feature_vector/feature_test_kmeans.dat")
+	os.system("rm -f ../../data/feature_vector/feature_test.dat")

@@ -28,9 +28,7 @@ Using Logistic model to categorize fast-flux and non-fast-flux domains offline
 ```
 
 - /data：实验中所有数据。各个目录下的readme.md说明了该目录下文件的作用
-  - /example：示例数据
-  - /feature_vector：域名特征向量数据
-  - /levenshtein_distance：域名二级，三级标签编辑距离
+  - /raw_data：原始数据
   - /train_set：机器学习训练集
 - /lib：C++库文件
   - /source_code：C++库文件源代码
@@ -67,11 +65,20 @@ Using Logistic model to categorize fast-flux and non-fast-flux domains offline
 
   - get_vector：求域名特征向量
 
-    **由于近期IP活动库查询API存在问题，无法查询到解析IP的地理位置，导致第69行对端IP地理距离平均值的计算无法进行。所以目前的数据中这一栏是0，等到API修复后，去掉69行的注释，重新运行该函数即可**
-
 - 离线的Logistic模型
 
 - 在线的顺序极限学习机模型
+
+## 使用
+
+- 在线/离线分类
+
+  - 获取原始数据的特征向量：python3 modules/Model/get_vector.py
+
+  - 在线分类：python3 modules/Online-OSELM/Online-OSELM.py
+
+  - 离线分类：python3 modules/Offline-Logistic/Offline_Logistic.py
+
 
 ## DBScan聚类编辑距离
 

@@ -1,15 +1,19 @@
 #!coding=utf8
 
+import sys
+sys.path.append("../../")
 import numpy as np
 from utils.tools import *
 from sklearn.linear_model import LogisticRegression
 
 # 从文件中读取域名特征向量
-def read_data(path):
+# ignore: 忽略前n列
+def read_data(path, ignore=0):
 	res = []
 	with open(path, "r") as f:
 		for line in f.readlines():
-			res.append(eval(line))
+			temp = eval(line)[ignore:]
+			res.append([float(i) for i in temp])
 
 	return np.array(res)
 
@@ -31,18 +35,27 @@ def error_calc(predict, actual):
 
 
 if __name__ == '__main__':
+	# 训练数据集路径
+	trainPath = "../../data/train_set/train_vector.dat"
+	# 测试数据集路径
+	predictPath = "../../data/train_set/vector.dat"
+
+	# 读取数据集
+	# 暂时使用[:,:-1]切掉最后一列的解析IP平均距离，训练数据有待完善
+	train = read_data(trainPath)[:,:-1]
+	predict = read_data(predictPath, 1)[:,:-1]
+	# 建立Logistic模型
 	model = LogisticRegression()
-	init_set = read_data("../../data/train_set/vector.dat")
 	# 0-1归一化处理
-	init_set = normalize(init_set)
-	# 打乱顺序
-	np.random.shuffle(init_set)
+	train = normalize(train, 0)
+	predict = normalize(predict)
+	# # 打乱顺序
+	# np.random.shuffle(train)
+
 	# 训练模型
 	# 参数1为测度矩阵，参数2为label数组
-	# 后1000个用于预测，前面的用来训练
-	model.fit(init_set[:-1000,1:], init_set[:-1000,:1].ravel())
-	# 预测结果为1维数组
-	res = model.predict(init_set[-1000:,1:])
-	actual = init_set[-1000:,:1].reshape(1, -1)
-	print("准确率为：%d" % error_calc(res, actual))
+	model.fit(train[:,1:], train[:,:1].ravel())
+	# 预测结果并输出
+	res = model.predict(predict)
+	print(res)
 	
