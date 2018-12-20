@@ -19,8 +19,10 @@
 #include <set>
 #include <cstdio>
 #include <algorithm>
-#include "json.hpp"
-using json = nlohmann::json;
+#include "include/rapidjson/document.h"
+#include "include/rapidjson/writer.h"
+#include "include/rapidjson/stringbuffer.h"
+
 using namespace std;
 
 #define DNS_DGA_LOCATION         "./data"//"/data/lzhang/Fast_Flux_Detection/Src_Data"
@@ -228,8 +230,13 @@ void getwhoisfromfile(const char*Infile,const char*outfile)
         cout<<"open file"<<outfile<<"error:"<<endl;
         return;
     }
+
+    int ccc = 0;
     while(!fin.eof())
     {
+        ccc++;
+        cout<<ccc<<"..."<<endl;
+
         getline(fin, line);
         count = 0;
         if(line.size() == 0)//空行
@@ -505,12 +512,15 @@ vector<IPaddressinfo> getIPinformationfromIPCIS(vector<string> IPLocationInfo)
                     // 排除掉一些空string的影响，正常的JSON都很长
                     if (outputString.size() >= 20)
                     {
-                        json j = json::parse(outputString);
-                        curIPaddressinfo.country = j["location"]["country"];
-                        curIPaddressinfo.region = j["location"]["region"];
-                        curIPaddressinfo.city = j["location"]["city"];
-                        curIPaddressinfo.longitude = j["location"]["longitude"];
-                        curIPaddressinfo.latitude = j["location"]["latitude"];
+                        rapidjson::StringStream s(outputString.c_str());
+                        rapidjson::Document d;
+                        d.ParseStream(s);
+
+                        curIPaddressinfo.country = d["location"]["country"].GetString();
+                        curIPaddressinfo.region = d["location"]["region"].GetString();
+                        curIPaddressinfo.city = d["location"]["city"].GetString();
+                        curIPaddressinfo.longitude = d["location"]["longitude"].GetString();
+                        curIPaddressinfo.latitude = d["location"]["latitude"].GetString();
                     }
                 }
             }
@@ -580,14 +590,14 @@ int main()
     //     }
     // }
 
-    fileprocessing("./data/alexa_raw","./temp/alexa_after");
-    getwhoisfromfile("./temp/alexa_after","./temp/alexa");
-    // resolvedIPlist = getManagementInfo("./temp/data");
-    // nameServerIPlist = getLocationInfo("./temp/data");
-    // resolvedIPLocation = getIPinformationfromIPCIS(resolvedIPlist);
-    // nsIPLocation = getIPinformationfromIPCIS(nameServerIPlist);
-    // writeIPLocation("./temp/resolved.tmp", resolvedIPlist, resolvedIPLocation);
-    // writeIPLocation("./temp/ns.tmp", nameServerIPlist, nsIPLocation);
+    fileprocessing("./data/alexa_raw","./temp/alexa_after.tmp");
+    getwhoisfromfile("./temp/alexa_after.tmp","./temp/alexa.dat");
+    resolvedIPlist = getManagementInfo("./temp/alexa.dat");
+    nameServerIPlist = getLocationInfo("./temp/alexa.dat");
+    resolvedIPLocation = getIPinformationfromIPCIS(resolvedIPlist);
+    nsIPLocation = getIPinformationfromIPCIS(nameServerIPlist);
+    writeIPLocation("./temp/resolved.dict", resolvedIPlist, resolvedIPLocation);
+    writeIPLocation("./temp/ns.dict", nameServerIPlist, nsIPLocation);
 
     return 0;
 }

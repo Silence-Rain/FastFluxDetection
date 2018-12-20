@@ -73,13 +73,19 @@ def gen_vector(res):
 
 	return vectors
 
+def write_file(path, vectors):
+	with io.open(path, "w", encoding="utf8") as f:
+		for k, v in vectors.items():
+			res = [k]
+			res.extend(v)
+			f.write("%s\n" % str(res))
+
 
 if __name__ == '__main__':
-	raw = read_file("./temp/data")
-	ns_dict = read_dict("./temp/ns.tmp")
-	resolved_dict = read_dict("./temp/resolved.tmp")
+	raw = read_file("./temp/alexa.dat")
+	ns_dict = read_dict("./temp/ns.dict")
+	resolved_dict = read_dict("./temp/resolved.dict")
 	res = merge(raw, ns_dict, resolved_dict)
 	vs = gen_vector(res)
-
-	print(vs)
+	write_file("./temp/alexa.vec", vs)
 
