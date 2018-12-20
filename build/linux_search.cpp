@@ -580,14 +580,14 @@ int main()
     //     }
     // }
 
-    // fileprocessing("./data/test","./temp/test_after");
-    // getwhoisfromfile("./temp/test_after","./temp/data");
-    resolvedIPlist = getManagementInfo("./temp/data");
-    nameServerIPlist = getLocationInfo("./temp/data");
-    resolvedIPLocation = getIPinformationfromIPCIS(resolvedIPlist);
-    nsIPLocation = getIPinformationfromIPCIS(nameServerIPlist);
-    writeIPLocation("./temp/resolved.tmp", resolvedIPlist, resolvedIPLocation);
-    writeIPLocation("./temp/ns.tmp", nameServerIPlist, nsIPLocation);
+    fileprocessing("./data/alexa_raw","./temp/alexa_after");
+    getwhoisfromfile("./temp/alexa_after","./temp/alexa");
+    // resolvedIPlist = getManagementInfo("./temp/data");
+    // nameServerIPlist = getLocationInfo("./temp/data");
+    // resolvedIPLocation = getIPinformationfromIPCIS(resolvedIPlist);
+    // nsIPLocation = getIPinformationfromIPCIS(nameServerIPlist);
+    // writeIPLocation("./temp/resolved.tmp", resolvedIPlist, resolvedIPLocation);
+    // writeIPLocation("./temp/ns.tmp", nameServerIPlist, nsIPLocation);
 
     return 0;
 }

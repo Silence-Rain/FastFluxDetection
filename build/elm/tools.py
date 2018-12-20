@@ -8,20 +8,18 @@ import numpy as np
 
 # 计算地理分布的香农熵
 # 根据ip所属的国家和地区，计算分布概率
-# 参数：{ip: [[国家,地区,城市], ...]}
+# 参数：["国家-地区", ...]
 # 返回值：香农熵（保留6位小数）
 def shannon_entropy(geos):
-	# 从地理归属字段中截取国家，地区部分
-	raw = ["%s-%s" % (x[0],x[1]) for y in geos.values() for x in y]
 	prob_raw = {}
 	# 计算各个国家的频数
-	for item in raw:
+	for item in geos:
 		if item in prob_raw:
 			prob_raw[item] += 1
 		else:
 			prob_raw[item] = 1
 
-	total = len(raw)
+	total = len(geos)
 	# 计算各个国家分布概率
 	prob = [x / total for x in prob_raw.values()]
 
@@ -32,35 +30,22 @@ def shannon_entropy(geos):
 
 	return round(entropy, 6)
 
-# 计算whois测度信息
-# 参数：原始whois信息
-# 返回值：{是否过期，信息完整的字段数}
-def whois_analysis(info):
-	ret = {"is_expire": 0, "item_complete": 0}
-	cur = time.time()
-	try:
-		expire = time.mktime(time.strptime(info[-1].lower(), "%d-%b-%Y"))
-		ret["is_expire"] = 0 if (cur < expire) else 1
-	except:
-		ret["is_expire"] = 1
+# 判断whois是否过期
+# 参数：whois过期timestamp
+# 返回值：是否过期
+def whois_expire(ts):
+	return 1 if ts < int(time.time()) else 0
 
-	for item in info:
-		if len(item) != 0:
-			ret["item_complete"] += 1
+# 计算解析IP到nsIP的地理距离平均值
+# 参数：[[iplng1, iplat1], ...], [[nslng1, nslat1], ...]
+# 返回值：解析IP到nsIP的地理距离平均值（保留6位小数）
+def average_distance(ips, nss):
+	dists = []
+	for i in ips:
+		for j in nss:
+			dists.append(haversine(i, j))
 
-	return ret
-
-# 计算对端IP到解析IP的地理距离平均值
-# 返回值：{self:(经度,纬度), opposite:[(经度,纬度),...]}
-# 返回值：对端IP到解析IP的地理距离平均值（保留6位小数）
-def opposite_location(ip_dict):
-	ret = []
-	opposite_dist = []
-	for item in ip_dict["opposite"]:
-		opposite_dist.append(haversine(ip_dict["self"], item))
-	# 记录每个对端IP的平均距离
-	ret.append(round(sum(opposite_dist)/len(opposite_dist), 6))
-	return round(sum(ret)/len(ret), 6)
+	return round(sum(dists) / len(dists), 6)
 
 # 计算地球上两个经纬度坐标点之间大圆距离
 # 使用haversine公式
